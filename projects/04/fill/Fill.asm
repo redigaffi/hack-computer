@@ -1,14 +1,71 @@
-// This file is part of www.nand2tetris.org
-// and the book "The Elements of Computing Systems"
-// by Nisan and Schocken, MIT Press.
-// File name: projects/04/Fill.asm
+(MAIN)
+	// if any key pressed
+	@KBD
+	D=M
+	@ONSCREEN
+	D;JGT
 
-// Runs an infinite loop that listens to the keyboard input.
-// When a key is pressed (any key), the program blackens the screen,
-// i.e. writes "black" in every pixel;
-// the screen should remain fully black as long as the key is pressed. 
-// When no key is pressed, the program clears the screen, i.e. writes
-// "white" in every pixel;
-// the screen should remain fully clear as long as no key is pressed.
+	// else
+	@8192 
+	D=A
+	@CLEARSCREEN
+	0;JMP
 
-// Put your code here.
+	@MAIN
+	0;JMP
+
+// Clear all screen pixels
+(CLEARSCREEN)
+	@SCREEN
+	A=D+A
+	M=0
+	D=D-1
+	@CLEARSCREEN
+	D;JGE
+	@MAIN
+	0;JMP
+
+// Flip all screen pixels on
+(ONSCREEN)
+	//Set RAM[0] to screen size 8K 
+	@8192 
+	D=A
+	@0 
+	M=D
+
+	// Set counter (i) at RAM[1]
+	@1
+	M=0
+
+	// Copy counter (i) at RAM[1] to register D
+	(ONSCREENLOOP)
+	@1
+	D=M
+
+	@SCREEN
+	A=A+D
+	M=!M
+
+	// Increment counter at RAM[1]
+	@1
+	M=M+1
+
+	// Decrement counter at RAM[0]
+	@0
+	M=M-1
+	D=M
+
+	@ONSCREENLOOP
+	D;JGT
+
+// Keep screen black while key pressed (dont re-do previous work)
+(MAINLOOP)
+	@KBD
+	D=M
+	@MAINLOOP
+	D;JGT
+
+// else: no key pressed jump to main
+@MAIN
+0;JMP
+

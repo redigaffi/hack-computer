@@ -39,5 +39,75 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+		// A register
+		Not(in[0]=instruction[15], out=opCodeType); // bit 15 represents opcode type: 0 = A instruction, 1 = C instruction
+		Mux16(a=aluOutput, b=instruction, sel=opCodeType, out=registerAInput);
+		Or(a=instruction[5], b=opCodeType, out=loadARegister);
+		ARegister(in=registerAInput, load=loadARegister, out[0..14]=addressM, out=outRegisterA); 
+
+		// D register
+		And(a=instruction[15], b=instruction[4], out=writeD);
+		DRegister(in=aluOutput, load=writeD, out=aluInputA, out=outRegisterD); 
+
+		// ALU
+		Mux16(a=outRegisterA, b=inM, sel=instruction[12], out=aluInputB); 
+		ALU(x=aluInputA, y=aluInputB, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=aluOutput, out=outM, zr=aluZr, ng=aluNg);
+
+		//writeM (Hack to rename pin3 (d3) to writeM)
+		And(a=instruction[3], b=instruction[15], out=writeM);
+
+		// Jumping setup
+		Not(in=instruction[2], out=notJ1);
+		Not(in=instruction[1], out=notJ2);
+		Not(in=instruction[0], out=notJ3);
+
+		And(a=instruction[2], b=instruction[15], out=j1);
+		And(a=instruction[1], b=instruction[15], out=j2);
+		And(a=instruction[0], b=instruction[15], out=j3);
+
+		Not(in=aluZr, out=notAluZr);
+		Not(in=aluNg, out=notAluNg);
+
+		// JGT (if out > 0 jump)
+		And(a=notAluZr, b=notAluNg, out=notZrAndNotNg);
+		And4(a=notJ1, b=notJ2, c=j3, d=notZrAndNotNg, out=jgt);
+
+		// JEQ (if out = 0 jump)
+		And(a=aluZr, b=notAluNg, out=aluZrAndNotNegative);
+		And4(a=notJ1, b=j2, c=notJ3, d=aluZrAndNotNegative, out=jeq);
+
+		// JGE (if out >= 0 jump)
+		And(a=true, b=notAluNg, out=aluNotNegative); // can this be removed?
+		And4(a=notJ1, b=j2, c=j3, d=aluNotNegative, out=jge);
+
+		// JLT (if out < 0 jump)
+		And(a=notAluZr, b=aluNg, out=notAluZrAndAluNg);
+		And4(a=j1, b=notJ2, c=notJ3, d=notAluZrAndAluNg, out=jlt);
+
+		// JNE (if out != 0 jump)
+		And(a=notAluZr, b=true, out=notAluZero); // can this be removed?
+		And4(a=j1, b=notJ2, c=j3, d=notAluZero, out=jne);
+
+		// JLE (if out <= 0 jump)
+		Or(a=aluZr, b=aluNg, out=jle1);
+		And4(a=j1, b=j2, c=notJ3, d=jle1, out=jle);
+
+		// JMP (jump unconditionally)
+		And4(a=j1, b=j2, c=j3, d=true, out=jmp);
+
+		// Jump if any of the previous conditions are met.
+		Or8Way(in[0]=false,
+			in[1]=jgt,
+			in[2]=jeq,
+			in[3]=jge,
+			in[4]=jlt,
+			in[5]=jne,
+			in[6]=jle,
+			in[7]=jmp,
+		out=pcLoad0);
+
+		And(a=pcLoad0, b=instruction[15], out=pcLoad);
+
+		// Program Counter (PC)
+		PC(in=outRegisterA, load=pcLoad, inc=true, reset=reset, out[0..14]=pc);
 }
