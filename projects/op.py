@@ -160,8 +160,7 @@ A=M
 M=D
 // SP++
 @SP
-M=M+1
-"""
+M=M+1"""
 
 class Op_Add():
     operation: Operation
@@ -183,8 +182,7 @@ A=A-1
 M=D
 //SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_Sub():
     operation: Operation
@@ -208,8 +206,7 @@ A=A-1
 M=D
 //SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_Neg():
     operation: Operation
@@ -227,8 +224,7 @@ D=D+1
 // STACK[SP-1] = D
 @SP
 A=M-1
-M=D
-"""
+M=D"""
 
 class Op_Eq():
     operation: Operation
@@ -272,8 +268,7 @@ M=-1
 
 // SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_Gt():
     operation: Operation
@@ -317,8 +312,7 @@ M=-1
 
 // SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_Lt():
     operation: Operation
@@ -362,8 +356,7 @@ M=-1
 
 // SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_And():
     operation: Operation
@@ -390,8 +383,7 @@ M=D
 
 // SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_Or():
     operation: Operation
@@ -418,8 +410,7 @@ M=D
 
 // SP--
 @SP
-M=M-1
-"""
+M=M-1"""
 
 class Op_Not():
     operation: Operation
@@ -432,8 +423,7 @@ class Op_Not():
         return f"""
 @SP
 A=M-1
-M=!M
-"""
+M=!M"""
 
 class Op_Function():
     operation: Operation
@@ -541,8 +531,7 @@ M=D
 // goto retAddr
 @retAddr
 A=M
-0;JMP
-"""
+0;JMP"""
 
 class Op_Call():
     operation: Operation
@@ -558,7 +547,6 @@ class Op_Call():
         label_name = f"{file_name}$ret.{return_entry}"
         return f"""
 // push return address to stack
-({label_name})
 @{label_name}
 D=A
 @SP
@@ -631,7 +619,7 @@ M=D
 
 @{self.operation.segment}
 0;JMP
-"""
+({label_name})"""
 
 class Op_Label():
     operation: Operation
@@ -642,8 +630,7 @@ class Op_Label():
 
     def __str__(self) -> str:
         return f"""
-({self.operation.segment})
-"""
+({self.operation.segment})"""
 
 class Op_Goto():
     operation: Operation
@@ -672,6 +659,11 @@ class Op_IfGoto():
 @SP
 A=M-1
 D=M
+
+//SP--
+@SP
+M=M-1
+
 // if D > 0 JUMP
 @{self.operation.segment}
 D;JGT

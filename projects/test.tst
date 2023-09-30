@@ -3,7 +3,7 @@
 // by Nisan and Schocken, MIT Press.
 // File name: projects/07/MemoryAccess/StaticTest/StaticTest.tst
 
-load BasicLoop.asm,
+load test.asm,
 
 set RAM[0] 256,    // initializes the stack pointer
 set RAM[1] 300,   // base address of the local segment

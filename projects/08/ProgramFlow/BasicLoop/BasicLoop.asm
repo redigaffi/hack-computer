@@ -27,7 +27,6 @@ M=D
 M=M-1
 //label LOOP_START
 (LOOP_START)
-
 //push argument 0
 
 @0
@@ -41,7 +40,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //push local 0
 
 @0
@@ -55,7 +53,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //add
 @SP
 A=M-1
@@ -69,7 +66,6 @@ M=D
 //SP--
 @SP
 M=M-1
-
 //pop local 0
 
 @0
@@ -101,7 +97,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //push constant 1
 @1
 D=A
@@ -126,7 +121,6 @@ M=D
 //SP--
 @SP
 M=M-1
-
 //pop argument 0
 
 @0
@@ -158,12 +152,16 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //if-goto LOOP_START
 //D = *SP
 @SP
 A=M-1
 D=M
+
+//SP--
+@SP
+M=M-1
+
 // if D > 0 JUMP
 @LOOP_START
 D;JGT
@@ -181,4 +179,3 @@ M=D
 // SP++
 @SP
 M=M+1
-

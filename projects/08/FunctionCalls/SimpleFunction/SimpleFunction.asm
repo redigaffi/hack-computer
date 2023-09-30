@@ -34,7 +34,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //push local 1
 
 @1
@@ -48,7 +47,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //add
 @SP
 A=M-1
@@ -62,12 +60,10 @@ M=D
 //SP--
 @SP
 M=M-1
-
 //not
 @SP
 A=M-1
 M=!M
-
 //push argument 0
 
 @0
@@ -81,7 +77,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //add
 @SP
 A=M-1
@@ -95,7 +90,6 @@ M=D
 //SP--
 @SP
 M=M-1
-
 //push argument 1
 
 @1
@@ -109,7 +103,6 @@ M=D
 // SP++
 @SP
 M=M+1
-
 //sub
 @SP
 A=M-1
@@ -125,7 +118,6 @@ M=D
 //SP--
 @SP
 M=M-1
-
 //return
 // endFrame = LCL
 @LCL
@@ -200,9 +192,4 @@ M=D
 // goto retAddr
 @retAddr
 A=M
-0;JMP
-
-
-(INF_LOOP)
-@INF_LOOP
 0;JMP
