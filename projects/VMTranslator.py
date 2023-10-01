@@ -1,8 +1,10 @@
 import sys
+import os
 import re
 from typing import Optional
 import config
 config.file_name = sys.argv[1]
+config.arg1 = sys.argv[1]
 from op import Operation, OpCodes, MemorySegments, opcode_asm_mapping
 
 def load_file_and_cleanup(path) -> list[str]:
@@ -64,7 +66,125 @@ def write_to_file(file_name: str, machine_code: str) -> None:
     with open(file_name, 'w') as f:
         f.write(machine_code)
 
-lines = load_file_and_cleanup(config.file_name)
-tokens = tokenize(lines)
-asm = generate_hack_asm(tokens)
-write_to_file(f"{config.file_name.split('.')[0]}.asm", asm)
+
+# def bootstrap_code() -> str:
+#     return f"""
+# // Bootstrap
+# @256
+# D=A
+# @SP
+# M=D
+# @Sys.init
+# 0;JMP
+# """
+
+def bootstrap_code() -> str:
+    return f"""
+// Bootstrap
+// Set stack pointer
+@256
+D=A
+@SP
+M=D
+
+// push return address to stack
+@Bootstrap$ret.0
+D=A
+@SP
+A=M
+M=D
+// SP++
+@SP
+M=M+1
+
+//push LCL
+@LCL
+D=M
+
+@SP
+A=M
+M=D
+// SP++
+@SP
+M=M+1
+
+//push ARG
+@ARG
+D=M
+
+@SP
+A=M
+M=D
+// SP++
+@SP
+M=M+1
+
+//push THIS 
+@THIS
+D=M
+
+@SP
+A=M
+M=D
+// SP++
+@SP
+M=M+1
+
+//push THAT 
+@THAT
+D=M
+
+@SP
+A=M
+M=D
+// SP++
+@SP
+M=M+1
+
+//ARG = SP-5-nArgs (no args)
+@5
+D=A
+@SP
+D=M-D
+@ARG
+M=D
+
+//LCL = SP
+@SP
+D=M
+@LCL
+M=D
+
+@Sys.init
+0;JMP
+(Bootstrap$ret.0)
+"""
+
+asm_content = bootstrap_code()
+path = f"{config.arg1.split('.')[0]}.asm"
+
+if os.path.isfile(config.arg1):
+    lines = load_file_and_cleanup(config.arg1)
+    tokens = tokenize(lines)
+    asm_content = generate_hack_asm(tokens)
+else:
+    folder = config.arg1
+    if config.arg1[-1] == "/":
+        config.arg1 = config.arg1[:-1] 
+
+    file_name = config.arg1.split('/')[-1]
+    path = f"{folder}/{file_name}.asm"
+    
+    for filename in os.scandir(config.arg1):
+        if filename.is_file():
+            ext = filename.name.split('.')[-1]
+            if ext != 'vm':
+                continue
+
+            config.file_name = filename.name.split('.')[0]
+            lines = load_file_and_cleanup(filename.path)
+            tokens = tokenize(lines)
+            asm_content += generate_hack_asm(tokens)
+
+
+write_to_file(path, asm_content)

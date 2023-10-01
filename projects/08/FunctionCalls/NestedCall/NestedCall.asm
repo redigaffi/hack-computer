@@ -1,3 +1,6 @@
+
+@Sys.init
+0;JMP
 //function Sys.init 0
 (Sys.init)
 

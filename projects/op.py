@@ -664,9 +664,9 @@ D=M
 @SP
 M=M-1
 
-// if D > 0 JUMP
+// if D != 0 JUMP
 @{self.operation.segment}
-D;JGT
+D;JNE
 """
 
 opcode_asm_mapping = {
