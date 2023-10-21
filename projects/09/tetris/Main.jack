@@ -1,0 +1,98 @@
+//@TODO: Check for screen boundaries
+//
+class Main {
+
+	function void drawLine() { 
+		var int currentLine;
+		let currentLine = 0;
+
+		// do Screen.setColor(true);
+		while (currentLine < 255) {
+				do Screen.drawPixel(300, currentLine);
+				let currentLine = currentLine + 1;
+		}
+		
+		return;
+	}
+
+	function void main() {
+		var Array shapes;
+		var Shape currentObj;
+		var Shape tmpObj;
+		var boolean exit;
+		var int bottom;
+		var char keyPressed;
+		var int shapeAmountTmp, shapeAmount, yFrequency, yCounter, counter;
+
+		let shapes = Array.new(100);
+		let bottom = 0;
+		let exit = false;
+		// Every 20 fps move 1 down (20/10 = every 2s)
+		let yFrequency = 5;
+		let yCounter = 0;
+		let shapeAmount = 0;
+		let shapeAmountTmp = 0;
+
+		// let currentObj = Shape.new(0, 0, 0);
+		let currentObj = Shape.getNewRandomShape(yCounter);
+
+		while (~exit) {
+				// do Screen.clearScreen();
+				do Main.drawLine();
+
+				// Draw existing shapes
+				let shapeAmountTmp = 0;
+				while(shapeAmountTmp < shapeAmount) {
+					let tmpObj = shapes[shapeAmountTmp];
+					do tmpObj.draw();
+					let shapeAmountTmp = shapeAmountTmp + 1;
+				}
+
+
+				// do Screen.setColor(true);
+				// do Screen.drawPixel(512, 50);
+				// do Screen.drawPixel(512, 51);
+				//
+				let keyPressed = Keyboard.keyPressed();
+
+				if (keyPressed = 130) {
+					do currentObj.updateX(currentObj.getX() - 1);
+				}
+
+				if (keyPressed = 132) {
+					do currentObj.updateX(currentObj.getX() + 1);
+				}
+
+				if (keyPressed = 133) {
+					do currentObj.updateY(currentObj.getY() + 1);
+				}
+
+				if (yCounter = yFrequency) {
+					do currentObj.updateY(currentObj.getY() + 1);
+					let yCounter = 0;
+				}
+
+				if(currentObj.collision(shapes)) {
+					do currentObj.draw();
+					let shapes[shapeAmount] = currentObj;
+					let shapeAmount = shapeAmount + 1;
+					let currentObj = Shape.getNewRandomShape(yCounter);
+				} else {
+					do currentObj.draw();
+				}
+
+				let yCounter = yCounter + 1;
+				if (counter = 32767) {
+					let counter = 0;
+				} else {
+					let counter = counter + 1;
+				}
+
+
+				// 10 fps
+				do Sys.wait(100);
+		}
+
+		return;
+	}
+}

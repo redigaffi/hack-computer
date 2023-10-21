@@ -1,0 +1,21 @@
+//@TODO: Check for screen boundaries
+//
+class Main {
+	function void main() {
+		var int mod;
+		do Output.printInt(Random.lcg(0, 0, 10));
+		do Output.printString(" ");
+		do Output.printInt(Random.lcg(1, 0, 10));
+		do Output.printString(" ");
+		do Output.printInt(Random.lcg(2, 0, 10));
+		do Output.printString(" ");
+		do Output.printInt(Random.lcg(3, 0, 10));
+		do Output.printString(" ");
+		do Output.printInt(Random.lcg(4, 0, 10));
+		do Output.printString(" ");
+		do Output.printInt(Random.lcg(5, 0, 10));
+		do Output.printString(" ");
+		do Output.printInt(Random.lcg(6, 0, 10));
+		return;
+	}
+}

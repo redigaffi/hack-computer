@@ -1,0 +1,114 @@
+class Shape {
+	/**
+	* Specifies the type of the shape:
+	* 0: Rectangle
+	*/
+	field int type;
+	field int x;
+	field int y;
+
+	constructor Shape new(int ptype, int px, int py) {
+		let x = px;
+		let y = py;
+		let type = ptype;
+		return this;
+  } 
+
+	function Shape getNewRandomShape(int seed) {
+			var int t, x;
+			let t = Random.lcg(seed, 0, 1);
+			let x = Random.lcg(seed, 0, 7);
+			return Shape.new(t, x, 0);
+	}
+
+	method void updatePosition(int px, int py) {
+		let x = px;
+		let y = py;
+		return;
+	}
+
+	method void updateX(int px) {
+		if (px < 0) {
+			let px = 0;
+		}
+		if (px > 8) {
+			let px = 8;
+		}
+		let x = px;
+		return;
+	}
+
+	method void updateY(int py) {
+		if (py > 16) {
+			let y = 16;
+			return;
+		}
+
+		let y = py;
+		return;
+	}
+
+	method int getX() {
+		return x;
+	}
+
+	method int getY() {
+		return y;
+	}
+
+	method void drawRectangle() {
+		var int py1, py2, px1, px2, height, width;
+		let height = 15;
+		let width = 60;
+		
+		if (y > 16) {
+			let y = 16;
+		}
+
+		let py1 =  (y*height);
+		let py2 =  py1+height;
+
+		// Horizontal boundaries
+		if (x = 8) {
+			let px2 = 511;
+			let px1 = px2-60;
+		} else {
+			let px1 = (x*width);
+			let px2 = px1+width;
+		}
+
+
+		do Screen.drawRectangle(px1, py1, px2, py2);
+		return;
+	}
+
+	method boolean rectangleCollision() {
+		// Ground collision
+		if (y > 16) {
+			return true;
+		}
+		if (y = 16) {
+			return true;
+		}
+		
+		return false;
+	}
+
+	method boolean collision(Array objects) {
+		// Rectangle
+		if (type = 0) {
+			return rectangleCollision();
+		}
+		
+		return false;
+	}
+
+	method void draw() {
+		// Rectangle
+		if (type = 0) {
+			do drawRectangle();
+		}
+		
+		return;
+	}
+}

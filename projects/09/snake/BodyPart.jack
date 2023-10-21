@@ -1,0 +1,25 @@
+class BodyPart {
+	field int x;
+	field int y;
+
+	constructor BodyPart new(int px, int py) {
+		let x = px;
+		let y = py;
+		return this;
+  } 
+
+	method void updatePosition(int px, int py) {
+		let x = px;
+		let y = py;
+		return;
+	}
+
+	method int getX() {
+		return x;
+	}
+
+	method int getY() {
+		return y;
+	}
+}
+

@@ -1,0 +1,93 @@
+class Player {
+	field int x;
+	field int y;
+	field int length;
+	field Array bodyParts;
+
+	constructor Player new(int px, int py) {
+		let length = 0;
+		let x = px;
+		let y = py;
+
+		return this;
+  } 
+
+	method void updatePosition(int px, int py) {
+		let x = px;
+		let y = py;
+		return;
+	}
+
+	method int getX() {
+		return x;
+	}
+
+	method int getY() {
+		return y;
+	}
+
+	method boolean canEat(Food food) {
+		var int foodX, foodY;
+		var boolean b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11;
+
+		let foodX = food.getX();
+		let foodY = food.getY();
+
+		let b1 = x > (foodX - 2);
+		let b2 = x = (foodX - 2);
+
+		let b3 = x < (foodX + 7);
+		let b4 = x = (foodX  + 7);
+
+		let b5 = (b1 | b2) & (b3 | b4);
+
+		let b6 = y > (foodY - 2);
+		let b7 = y = (foodY - 2);
+
+		let b8 = y < (foodY + 7);
+		let b9 = y = (foodY  + 7);
+
+		let b10 = (b6 | b7) & (b8 | b9);
+		let b11 = b5 & b10;
+
+		if (b11) {
+			return true;
+		}
+
+		return false;
+	}
+	
+	method void growBody(int lastDirection) {
+		var int newX, newY;
+
+		if (lastDirection = 0) {
+			let newX = x - 2;
+			let newY = y;
+		} else {
+			let newY = y- 2;
+			let newX = x;
+		}
+
+		let bodyParts[length] = BodyPart.new(newX, newY);
+		let length = length + 1;
+		return;
+	}
+
+	method void draw() {
+		var int c;
+		var BodyPart tmp;
+		var int tmpX, tmpY;
+		do Screen.drawRectangle(x, y, x+5, y+5);
+		
+		let c = 0;
+		while (c < length) {
+			let tmp = bodyParts[c];
+			let tmpX = tmp.getX();
+			let tmpY = tmp.getY();
+			do Screen.drawRectangle(tmpX, tmpY, tmpX+5, tmpY+5);
+			let c = c + 1;
+		}
+
+		return;
+	}
+}

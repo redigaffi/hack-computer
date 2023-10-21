@@ -1,0 +1,81 @@
+class Main {
+   function void main() {
+				var Player player;
+				var boolean exit;
+				var char keyPressed;
+				var String entropyData;
+				var int entropy, i, entropyDataLength, x, y, lastDirection, lastSpeed;
+				var Food food;
+
+				let exit = false;
+
+				let lastSpeed = 2;
+				let lastDirection = 0;
+				let x = 0;
+				let y = 0;
+				let player = Player.new(x, y);
+
+				let entropyData = Keyboard.readLine("Input random letters to generate entropy: ");
+
+				let entropy = 0;
+				let entropyDataLength = entropyData.length();
+				while (i < entropyDataLength)	{
+					let entropy = entropy + entropyData.charAt(i);
+					let i = i + 1;
+				}
+
+				let food = Food.new(entropy);
+
+				while (~exit) { 
+					do Screen.clearScreen();
+					do food.draw();
+
+					if (player.canEat(food)) {
+						do food.dispose();
+						let entropy = entropy + 1;
+						let food = Food.new(entropy);
+						do player.growBody(lastDirection);
+					}
+
+					let keyPressed = Keyboard.keyPressed();
+
+					// left
+					if (keyPressed = 130) {
+						let lastDirection = 0;
+						let lastSpeed = -2;
+					}
+
+					// right
+					if (keyPressed = 132) {
+						let lastDirection = 0;
+						let lastSpeed = 2;
+					}
+			
+					// up
+					if (keyPressed = 131) {
+						let lastDirection = 1;
+						let lastSpeed = -2;
+					}
+
+					// down
+					if (keyPressed = 133) {
+						let lastDirection = 1;
+						let lastSpeed = 2;
+					}
+
+					if (lastDirection = 0) {
+						let x = player.getX() + lastSpeed;
+					} else {
+						let y = player.getY() + lastSpeed;
+					}
+
+					do player.updatePosition(x, y);
+					do player.draw();
+
+					// 66 fps
+					do Sys.wait(70);
+				}
+
+				return;
+   }
+}

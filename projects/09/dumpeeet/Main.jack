@@ -1,0 +1,134 @@
+class Main {
+	 function void appendToBufferIfKeyPressed(String buffer, char pressedKey) {
+					if (pressedKey > 0) {
+						do buffer.appendChar(pressedKey);
+					}
+					return;
+	 }
+
+	function void drawMenuPanel(int mode, String menuBuffer) {
+			var String infoBuffer;
+			let infoBuffer = String.new(200);
+
+			do Output.moveCursor(0, 0);
+			do StringUtils.appendStringToA(infoBuffer, "Mode: ");
+
+			if (mode = 0) {
+				do StringUtils.appendStringToA(infoBuffer, "Insert");
+			}
+
+			if (mode = 1) {
+				do StringUtils.appendStringToA(infoBuffer, "Menu | Buffer: ");
+				do StringUtils.appendStringToA(infoBuffer, menuBuffer);
+			}
+
+			do Output.printString(infoBuffer);
+			do Screen.drawLine(0, 20, 511, 20);
+			return;
+	 }
+
+	 function String calculateVisibleText(String writeBuffer) {
+			var String visibleBuffer;
+			var int wL, i, lineBreaks, startIdx, tmp;
+			let visibleBuffer = String.new(200); //  Visible text in screen (split lines by enter key)
+			
+			let wL = writeBuffer.length();
+			let i = 0;
+			let lineBreaks = 0;
+
+			while (i < wL) {
+				if (writeBuffer.charAt(i) = 128) {
+					let lineBreaks  = lineBreaks + 1;
+				}
+
+				let i = i + 1;
+			}
+
+			let startIdx = lineBreaks - 2;	// 4 = max line breaks
+			if (startIdx < 0) {
+				let startIdx = 0;
+			}
+
+			let i = 0;
+			while (i < wL) {
+					if ((writeBuffer.charAt(i)) = 128 & (startIdx > 0)) {
+						let startIdx = startIdx - 1;
+					}
+					if (startIdx = 0) {
+							do visibleBuffer.appendChar(writeBuffer.charAt(i));		
+					}
+					let i = i + 1;
+			}
+
+
+			return visibleBuffer;
+	 }
+
+	function void main() {
+			var boolean exit;
+			var int mode, cursorX, cursorY;
+			var String writeBuffer, visibleBuffer, menuBuffer;
+			var char keyPressed;
+			
+			let writeBuffer = String.new(200); // All text, stored
+			let visibleBuffer = String.new(200); //  Visible text in screen (split lines by enter key)
+			let menuBuffer = String.new(200);
+
+			/*
+			 * 0: Insert mode
+			 * 1: Menu mode
+			 */
+			let mode = 0;
+			let keyPressed = 0;
+			let exit = false;
+
+			while (~exit) {
+				do Screen.clearScreen();
+				do Main.drawMenuPanel(mode, menuBuffer);
+				let visibleBuffer =  Main.calculateVisibleText(writeBuffer);
+				do Output.moveCursor(2, 0);
+				do Output.printString(visibleBuffer);
+				// do Output.printString(writeBuffer);
+
+				while(keyPressed = 0) {
+					let keyPressed = Keyboard.keyPressed();	
+				}
+
+				if (mode = 0) { // Insert mode
+					if (keyPressed = 140) { // ESC pressed
+						let mode = 1;
+						let keyPressed = 0;
+					}
+
+					do Main.appendToBufferIfKeyPressed(writeBuffer, keyPressed);
+				}
+				
+				if (mode = 1) { // Menu mode
+					if (keyPressed = 128) {// Enter
+						
+						if(StringUtils.compareString(menuBuffer, ":Q")) { // Quit program
+							do Sys.halt();
+						}
+					}
+
+					if (keyPressed = 140) { // ESC pressed
+						do menuBuffer.dispose();
+						let menuBuffer = String.new(200);
+						let keyPressed = 0;
+					}
+
+					if (keyPressed = 73) {// i 
+							let mode = 0;
+							let keyPressed = 0;
+					}
+
+					do Main.appendToBufferIfKeyPressed(menuBuffer, keyPressed);
+				}
+
+				let keyPressed = 0;
+				do Sys.wait(118);
+			}
+
+      return;
+   }
+}

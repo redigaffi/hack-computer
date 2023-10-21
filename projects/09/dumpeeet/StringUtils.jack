@@ -1,0 +1,35 @@
+class StringUtils {
+	
+   function void appendStringToA(String a, String b) { 
+			var int a2Length, i;
+			let a2Length = b.length();
+
+			let i = 0;
+			while (i < a2Length) {
+				do a.appendChar(b.charAt(i));
+				let i = i + 1;
+			}
+
+			return;
+	 }
+   function boolean compareString(String a, String b) { 
+			var int a1Length, a2Length, i;
+			let a1Length = a.length();
+			let a2Length = b.length();
+	
+			if (~(a1Length = a2Length)) {
+				return false;
+			}
+
+			let i = 0;
+			while (i < a1Length) {
+				if (~(a.charAt(i) = a.charAt(i)))	{
+					return false;
+				}
+
+				let i = i + 1;
+			}
+
+			return true;
+	 }
+}

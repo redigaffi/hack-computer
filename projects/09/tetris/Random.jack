@@ -1,0 +1,36 @@
+// Use keyboard input as entropy
+class Random {
+
+	/**
+	* Linear Congruential Generator (LCG):
+	* LCG is a simple and widely used method for generating pseudo-random numbers. It uses a linear recurrence equation of the form:
+	* Xn+1 = (aXn + c) mod m
+	* 
+	* Where:
+	* Xn is the current random number.
+	* a, c, and m are constants
+	*
+	* Only positive numbers!
+	*/
+	function int lcg(int seed, int min, int max) {
+		var int a, c, m, state, out;
+		let state = seed;
+		let a = 9853;
+		let c = 1540;
+		let m = 32767;
+		let state = MathUtils.modulus((a * state + c), m);
+		let out = MathUtils.modulus(state, (max - min + 1));
+			
+		if (min < 0 | max < 0) {
+			do Sys.error(4);
+		}
+
+		if (out < 0) {
+			let out = ~out + 1; //2s complement (this is more efficient than multiplying by -1)
+		}
+
+		let out = out + min; // Add minimum 
+	
+		return out;
+	}
+}

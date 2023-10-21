@@ -1,0 +1,186 @@
+function Main.drawLine 1
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 255
+lt
+not
+if-goto WHILE_END0
+push constant 300
+push local 0
+call Screen.drawPixel 2
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Main.main 11
+push constant 100
+call Array.new 1
+pop local 0
+push constant 0
+pop local 4
+push constant 0
+pop local 3
+push constant 5
+pop local 8
+push constant 0
+pop local 9
+push constant 0
+pop local 7
+push constant 0
+pop local 6
+push local 9
+call Shape.getNewRandomShape 1
+pop local 1
+label WHILE_EXP0
+push local 3
+not
+not
+if-goto WHILE_END0
+call Main.drawLine 0
+pop temp 0
+push constant 0
+pop local 6
+label WHILE_EXP1
+push local 6
+push local 7
+lt
+not
+if-goto WHILE_END1
+push local 6
+push local 0
+add
+pop pointer 1
+push that 0
+pop local 2
+push local 2
+call Shape.draw 1
+pop temp 0
+push local 6
+push constant 1
+add
+pop local 6
+goto WHILE_EXP1
+label WHILE_END1
+call Keyboard.keyPressed 0
+pop local 5
+push local 5
+push constant 130
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 1
+push local 1
+call Shape.getX 1
+push constant 1
+sub
+call Shape.updateX 2
+pop temp 0
+label IF_FALSE0
+push local 5
+push constant 132
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 1
+push local 1
+call Shape.getX 1
+push constant 1
+add
+call Shape.updateX 2
+pop temp 0
+label IF_FALSE1
+push local 5
+push constant 133
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 1
+push local 1
+call Shape.getY 1
+push constant 1
+add
+call Shape.updateY 2
+pop temp 0
+label IF_FALSE2
+push local 9
+push local 8
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push local 1
+push local 1
+call Shape.getY 1
+push constant 1
+add
+call Shape.updateY 2
+pop temp 0
+push constant 0
+pop local 9
+label IF_FALSE3
+push local 1
+push local 0
+call Shape.collision 2
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push local 1
+call Shape.draw 1
+pop temp 0
+push local 7
+push local 0
+add
+push local 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 7
+push constant 1
+add
+pop local 7
+push local 9
+call Shape.getNewRandomShape 1
+pop local 1
+goto IF_END4
+label IF_FALSE4
+push local 1
+call Shape.draw 1
+pop temp 0
+label IF_END4
+push local 9
+push constant 1
+add
+pop local 9
+push local 10
+push constant 32767
+eq
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push constant 0
+pop local 10
+goto IF_END5
+label IF_FALSE5
+push local 10
+push constant 1
+add
+pop local 10
+label IF_END5
+push constant 100
+call Sys.wait 1
+pop temp 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return

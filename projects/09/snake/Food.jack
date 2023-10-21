@@ -1,0 +1,30 @@
+class Food {
+	field int x;
+	field int y;
+
+	constructor Food new(int entropy) {
+		let x = Random.lcg(entropy, 20, 400);
+		let y = Random.lcg(entropy, 20, 200);
+		return this;
+  } 
+
+	method int getX() {
+		return x;
+	}
+
+	method int getY() {
+		return y;
+	}
+
+	method void draw() {
+		do Screen.drawRectangle(x, y, x+5, y+5);
+		return;
+	}
+
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+	
+}
+

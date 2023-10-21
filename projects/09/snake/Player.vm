@@ -1,0 +1,209 @@
+function Player.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+pop this 2
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push pointer 0
+return
+function Player.updatePosition 0
+push argument 0
+pop pointer 0
+push argument 1
+pop this 0
+push argument 2
+pop this 1
+push constant 0
+return
+function Player.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Player.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Player.canEat 13
+push argument 0
+pop pointer 0
+push argument 1
+call Food.getX 1
+pop local 0
+push argument 1
+call Food.getY 1
+pop local 1
+push this 0
+push local 0
+push constant 2
+sub
+gt
+pop local 2
+push this 0
+push local 0
+push constant 2
+sub
+eq
+pop local 3
+push this 0
+push local 0
+push constant 7
+add
+lt
+pop local 4
+push this 0
+push local 0
+push constant 7
+add
+eq
+pop local 5
+push local 2
+push local 3
+or
+push local 4
+push local 5
+or
+and
+pop local 6
+push this 1
+push local 1
+push constant 2
+sub
+gt
+pop local 7
+push this 1
+push local 1
+push constant 2
+sub
+eq
+pop local 8
+push this 1
+push local 1
+push constant 7
+add
+lt
+pop local 9
+push this 1
+push local 1
+push constant 7
+add
+eq
+pop local 10
+push local 7
+push local 8
+or
+push local 9
+push local 10
+or
+and
+pop local 11
+push local 6
+push local 11
+and
+pop local 12
+push local 12
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
+function Player.growBody 2
+push argument 0
+pop pointer 0
+push argument 1
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 0
+push constant 2
+sub
+pop local 0
+push this 1
+pop local 1
+goto IF_END0
+label IF_FALSE0
+push this 1
+push constant 2
+sub
+pop local 1
+push this 0
+pop local 0
+label IF_END0
+push this 2
+push this 3
+add
+push local 0
+push local 1
+call BodyPart.new 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push this 2
+push constant 1
+add
+pop this 2
+push constant 0
+return
+function Player.draw 4
+push argument 0
+pop pointer 0
+push this 0
+push this 1
+push this 0
+push constant 5
+add
+push this 1
+push constant 5
+add
+call Screen.drawRectangle 4
+pop temp 0
+push constant 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push this 2
+lt
+not
+if-goto WHILE_END0
+push local 0
+push this 3
+add
+pop pointer 1
+push that 0
+pop local 1
+push local 1
+call BodyPart.getX 1
+pop local 2
+push local 1
+call BodyPart.getY 1
+pop local 3
+push local 2
+push local 3
+push local 2
+push constant 5
+add
+push local 3
+push constant 5
+add
+call Screen.drawRectangle 4
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return

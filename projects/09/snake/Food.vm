@@ -1,0 +1,49 @@
+function Food.new 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+push constant 20
+push constant 400
+call Random.lcg 3
+pop this 0
+push argument 0
+push constant 20
+push constant 200
+call Random.lcg 3
+pop this 1
+push pointer 0
+return
+function Food.getX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Food.getY 0
+push argument 0
+pop pointer 0
+push this 1
+return
+function Food.draw 0
+push argument 0
+pop pointer 0
+push this 0
+push this 1
+push this 0
+push constant 5
+add
+push this 1
+push constant 5
+add
+call Screen.drawRectangle 4
+pop temp 0
+push constant 0
+return
+function Food.dispose 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

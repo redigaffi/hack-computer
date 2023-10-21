@@ -1,0 +1,8 @@
+class MathUtils {
+	function int modulus(int dividend, int divisor) {
+		var int quotient, remainder;
+		let quotient = dividend/divisor;
+		let remainder = dividend - (quotient*divisor);
+		return remainder;
+	}
+}
