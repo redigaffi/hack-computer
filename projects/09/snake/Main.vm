@@ -9,9 +9,10 @@ push constant 0
 pop local 7
 push constant 0
 pop local 8
+push local 9
 push local 7
 push local 8
-call Player.new 2
+call Player.new 3
 pop local 0
 push constant 42
 call String.new 1
@@ -154,8 +155,7 @@ push local 4
 call Food.new 1
 pop local 11
 push local 0
-push local 9
-call Player.growBody 2
+call Player.growBody 1
 pop temp 0
 label IF_FALSE0
 call Keyboard.keyPressed 0
@@ -226,9 +226,10 @@ add
 pop local 8
 label IF_END5
 push local 0
+push local 9
 push local 7
 push local 8
-call Player.updatePosition 3
+call Player.updatePosition 4
 pop temp 0
 push local 0
 call Player.draw 1

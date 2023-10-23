@@ -1,20 +1,66 @@
 class Player {
 	field int x;
 	field int y;
+	field int lastDirection;
 	field int length;
 	field Array bodyParts;
 
-	constructor Player new(int px, int py) {
+	constructor Player new(int pLastDirection, int px, int py) {
+		let bodyParts = Array.new(100);
 		let length = 0;
 		let x = px;
 		let y = py;
+		let lastDirection = pLastDirection;
 
 		return this;
   } 
 
-	method void updatePosition(int px, int py) {
+	method void updatePosition(int pLastDirection, int px, int py) {
+		var BodyPart tmp;
+		var int c, newX, newY, previousX, previousY;
+		
+		if (length > 0) {
+			let tmp = bodyParts[0];
+			let previousX = x;
+			let previousY = y;
+			// let previousX = tmp.getX();
+			// let previousY = tmp.getY();
+
+			if (lastDirection = 0) {
+				let newX = previousX - 5;
+				let newY = previousY;
+			} else {
+				let newY = previousY - 5;
+				let newX = previousX;
+			}
+
+			do tmp.updatePosition(newX,  newY);
+		}
+
+		let c = 1;
+		while (c < length) {
+			let tmp = bodyParts[c-1];
+			let previousX = tmp.getX();
+			let previousY = tmp.getY();
+
+			if (lastDirection = 0) {
+				let newX = previousX - 5;
+				let newY = previousY;
+			} else {
+				let newY = previousY - 5;
+				let newX = previousX;
+			}
+
+			let tmp = bodyParts[c];
+			do tmp.updatePosition(newX,  newY);
+
+			let c = c + 1;
+		}
+
 		let x = px;
 		let y = py;
+		let lastDirection = pLastDirection;
+
 		return;
 	}
 
@@ -57,14 +103,14 @@ class Player {
 		return false;
 	}
 	
-	method void growBody(int lastDirection) {
+	method void growBody() {
 		var int newX, newY;
 
 		if (lastDirection = 0) {
-			let newX = x - 2;
+			let newX = x - 10;
 			let newY = y;
 		} else {
-			let newY = y- 2;
+			let newY = y - 10;
 			let newX = x;
 		}
 

@@ -13,7 +13,7 @@ class Main {
 				let lastDirection = 0;
 				let x = 0;
 				let y = 0;
-				let player = Player.new(x, y);
+				let player = Player.new(lastDirection, x, y);
 
 				let entropyData = Keyboard.readLine("Input random letters to generate entropy: ");
 
@@ -34,7 +34,7 @@ class Main {
 						do food.dispose();
 						let entropy = entropy + 1;
 						let food = Food.new(entropy);
-						do player.growBody(lastDirection);
+						do player.growBody();
 					}
 
 					let keyPressed = Keyboard.keyPressed();
@@ -69,7 +69,7 @@ class Main {
 						let y = player.getY() + lastSpeed;
 					}
 
-					do player.updatePosition(x, y);
+					do player.updatePosition(lastDirection, x, y);
 					do player.draw();
 
 					// 66 fps
