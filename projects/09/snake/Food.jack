@@ -5,8 +5,6 @@ class Food {
 	constructor Food new(int entropy) {
 		let x = Random.lcg(entropy, 20, 400);
 		let y = Random.lcg(entropy, 20, 200);
-		// let x = 10;
-		// let y = 2;
 		return this;
   } 
 

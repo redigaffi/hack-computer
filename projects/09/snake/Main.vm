@@ -1,19 +1,4 @@
-function Main.main 12
-push constant 0
-pop local 1
-push constant 2
-pop local 10
-push constant 0
-pop local 9
-push constant 0
-pop local 7
-push constant 0
-pop local 8
-push local 9
-push local 7
-push local 8
-call Player.new 3
-pop local 0
+function Main.userInputToGenerateEntropy 4
 push constant 42
 call String.new 1
 push constant 73
@@ -103,36 +88,56 @@ call String.appendChar 2
 call Keyboard.readLine 1
 pop local 3
 push constant 0
-pop local 4
+pop local 0
 push local 3
 call String.length 1
-pop local 6
+pop local 2
 label WHILE_EXP0
-push local 5
-push local 6
+push local 1
+push local 2
 lt
 not
 if-goto WHILE_END0
-push local 4
+push local 0
 push local 3
-push local 5
+push local 1
 call String.charAt 2
 add
-pop local 4
-push local 5
+pop local 0
+push local 1
 push constant 1
 add
-pop local 5
+pop local 1
 goto WHILE_EXP0
 label WHILE_END0
-push local 4
+push local 0
+return
+function Main.main 12
+push constant 0
+pop local 1
+push constant 2
+pop local 10
+push constant 0
+pop local 9
+push constant 50
+pop local 7
+push constant 50
+pop local 8
+push local 9
+push local 7
+push local 8
+call Player.new 3
+pop local 0
+call Main.userInputToGenerateEntropy 0
+pop local 5
+push local 5
 call Food.new 1
 pop local 11
-label WHILE_EXP1
+label WHILE_EXP0
 push local 1
 not
 not
-if-goto WHILE_END1
+if-goto WHILE_END0
 call Screen.clearScreen 0
 pop temp 0
 push local 11
@@ -141,17 +146,19 @@ pop temp 0
 push local 0
 push local 11
 call Player.canEat 2
+pop local 2
+push local 2
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
 push local 11
 call Food.dispose 1
 pop temp 0
-push local 4
+push local 5
 push constant 1
 add
-pop local 4
-push local 4
+pop local 5
+push local 5
 call Food.new 1
 pop local 11
 push local 0
@@ -159,8 +166,8 @@ call Player.growBody 1
 pop temp 0
 label IF_FALSE0
 call Keyboard.keyPressed 0
-pop local 2
-push local 2
+pop local 3
+push local 3
 push constant 130
 eq
 if-goto IF_TRUE1
@@ -172,7 +179,7 @@ push constant 2
 neg
 pop local 10
 label IF_FALSE1
-push local 2
+push local 3
 push constant 132
 eq
 if-goto IF_TRUE2
@@ -183,7 +190,7 @@ pop local 9
 push constant 2
 pop local 10
 label IF_FALSE2
-push local 2
+push local 3
 push constant 131
 eq
 if-goto IF_TRUE3
@@ -195,7 +202,7 @@ push constant 2
 neg
 pop local 10
 label IF_FALSE3
-push local 2
+push local 3
 push constant 133
 eq
 if-goto IF_TRUE4
@@ -226,18 +233,19 @@ add
 pop local 8
 label IF_END5
 push local 0
+push local 2
 push local 9
 push local 7
 push local 8
-call Player.updatePosition 4
+call Player.updatePosition 5
 pop temp 0
 push local 0
 call Player.draw 1
 pop temp 0
-push constant 70
+push constant 80
 call Sys.wait 1
 pop temp 0
-goto WHILE_EXP1
-label WHILE_END1
+goto WHILE_EXP0
+label WHILE_END0
 push constant 0
 return

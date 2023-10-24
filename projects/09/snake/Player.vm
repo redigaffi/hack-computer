@@ -1,222 +1,230 @@
-function Player.new 0
-push constant 5
+function Player.new 1
+push constant 2
 call Memory.alloc 1
 pop pointer 0
-push constant 100
+push constant 500
 call Array.new 1
-pop this 4
-push constant 0
-pop this 3
-push argument 1
-pop this 0
-push argument 2
 pop this 1
+push constant 1
+pop this 0
+push constant 0
+push this 1
+add
 push argument 0
-pop this 2
+push argument 1
+push argument 2
+call BodyPart.new 3
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+label WHILE_EXP0
+push local 0
+push constant 30
+lt
+not
+if-goto WHILE_END0
+push pointer 0
+call Player.growBody 1
+pop temp 0
+push local 0
+push constant 1
+add
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
 push pointer 0
 return
 function Player.updatePosition 6
 push argument 0
 pop pointer 0
-push this 3
-push constant 0
-gt
+push argument 1
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 0
-push this 4
+push this 0
+push constant 1
+sub
+push this 1
 add
 pop pointer 1
 push that 0
 pop local 0
-push this 0
-pop local 4
-push this 1
-pop local 5
-push this 2
-push constant 0
-eq
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
-push local 4
-push constant 5
-sub
-pop local 2
-push local 5
-pop local 3
-goto IF_END1
-label IF_FALSE1
-push local 5
-push constant 5
-sub
-pop local 3
-push local 4
-pop local 2
-label IF_END1
 push local 0
-push local 2
-push local 3
-call BodyPart.updatePosition 3
+push argument 2
+push argument 3
+push argument 4
+call BodyPart.updatePosition 4
 pop temp 0
+push constant 0
+return
 label IF_FALSE0
-push constant 1
+push this 0
+push this 1
+add
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push this 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push local 0
+push argument 2
+push argument 3
+push argument 4
+call BodyPart.updatePosition 4
+pop temp 0
+push constant 0
 pop local 1
 label WHILE_EXP0
 push local 1
-push this 3
+push this 0
 lt
 not
 if-goto WHILE_END0
 push local 1
-push constant 1
-sub
-push this 4
+push this 1
 add
-pop pointer 1
-push that 0
-pop local 0
-push local 0
-call BodyPart.getX 1
-pop local 4
-push local 0
-call BodyPart.getY 1
-pop local 5
-push this 2
-push constant 0
-eq
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
-push local 4
-push constant 5
-sub
-pop local 2
-push local 5
-pop local 3
-goto IF_END2
-label IF_FALSE2
-push local 5
-push constant 5
-sub
-pop local 3
-push local 4
-pop local 2
-label IF_END2
 push local 1
-push this 4
+push constant 1
+add
+push this 1
 add
 pop pointer 1
 push that 0
-pop local 0
-push local 0
-push local 2
-push local 3
-call BodyPart.updatePosition 3
 pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
 push local 1
 push constant 1
 add
 pop local 1
 goto WHILE_EXP0
 label WHILE_END0
-push argument 2
-pop this 0
-push argument 3
-pop this 1
-push argument 1
-pop this 2
 push constant 0
 return
-function Player.getX 0
+function Player.getX 1
 push argument 0
 pop pointer 0
 push this 0
+push constant 1
+sub
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push local 0
+call BodyPart.getX 1
 return
-function Player.getY 0
+function Player.getY 1
 push argument 0
 pop pointer 0
+push this 0
+push constant 1
+sub
 push this 1
+add
+pop pointer 1
+push that 0
+pop local 0
+push local 0
+call BodyPart.getY 1
 return
-function Player.canEat 13
+function Player.canEat 15
 push argument 0
 pop pointer 0
 push argument 1
 call Food.getX 1
-pop local 0
+pop local 2
 push argument 1
 call Food.getY 1
+pop local 3
+push pointer 0
+call Player.getX 1
+pop local 0
+push pointer 0
+call Player.getY 1
 pop local 1
-push this 0
 push local 0
+push local 2
 push constant 2
 sub
 gt
-pop local 2
-push this 0
+pop local 4
 push local 0
+push local 2
 push constant 2
 sub
 eq
-pop local 3
-push this 0
+pop local 5
 push local 0
+push local 2
 push constant 7
 add
 lt
-pop local 4
-push this 0
+pop local 6
 push local 0
+push local 2
 push constant 7
 add
 eq
-pop local 5
-push local 2
-push local 3
-or
+pop local 7
 push local 4
 push local 5
 or
+push local 6
+push local 7
+or
 and
-pop local 6
-push this 1
+pop local 8
 push local 1
+push local 3
 push constant 2
 sub
 gt
-pop local 7
-push this 1
+pop local 9
 push local 1
+push local 3
 push constant 2
 sub
 eq
-pop local 8
-push this 1
+pop local 10
 push local 1
+push local 3
 push constant 7
 add
 lt
-pop local 9
-push this 1
+pop local 11
 push local 1
+push local 3
 push constant 7
 add
 eq
-pop local 10
-push local 7
-push local 8
-or
+pop local 12
 push local 9
 push local 10
 or
-and
-pop local 11
-push local 6
 push local 11
-and
-pop local 12
 push local 12
+or
+and
+pop local 13
+push local 8
+push local 13
+and
+pop local 14
+push local 14
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
@@ -226,69 +234,75 @@ return
 label IF_FALSE0
 push constant 0
 return
-function Player.growBody 2
+function Player.growBody 6
 push argument 0
 pop pointer 0
-push this 2
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 5
+push local 5
+call BodyPart.getX 1
+pop local 1
+push local 5
+call BodyPart.getY 1
+pop local 2
+push local 5
+call BodyPart.getLastDirection 1
+pop local 0
+push local 0
 push constant 0
 eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push this 0
+push local 1
 push constant 10
 sub
-pop local 0
-push this 1
-pop local 1
+pop local 3
+push local 2
+pop local 4
 goto IF_END0
 label IF_FALSE0
-push this 1
+push local 2
 push constant 10
 sub
-pop local 1
-push this 0
-pop local 0
+pop local 4
+push local 1
+pop local 3
 label IF_END0
-push this 3
-push this 4
+push this 0
+push this 1
 add
 push local 0
-push local 1
-call BodyPart.new 2
+push local 3
+push local 4
+call BodyPart.new 3
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push this 3
+push this 0
 push constant 1
 add
-pop this 3
+pop this 0
 push constant 0
 return
 function Player.draw 4
 push argument 0
 pop pointer 0
-push this 0
-push this 1
-push this 0
-push constant 5
-add
-push this 1
-push constant 5
-add
-call Screen.drawRectangle 4
-pop temp 0
 push constant 0
 pop local 0
 label WHILE_EXP0
 push local 0
-push this 3
+push this 0
 lt
 not
 if-goto WHILE_END0
 push local 0
-push this 4
+push this 1
 add
 pop pointer 1
 push that 0

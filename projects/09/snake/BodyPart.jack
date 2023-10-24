@@ -1,17 +1,24 @@
 class BodyPart {
 	field int x;
 	field int y;
+	field int dir;
 
-	constructor BodyPart new(int px, int py) {
+	constructor BodyPart new(int pDir, int px, int py) {
 		let x = px;
 		let y = py;
+		let dir = pDir;
 		return this;
   } 
 
-	method void updatePosition(int px, int py) {
+	method void updatePosition(int pDir, int px, int py) {
 		let x = px;
 		let y = py;
+		let dir = pDir;
 		return;
+	}
+
+	method int getLastDirection() {
+		return dir;
 	}
 
 	method int getX() {

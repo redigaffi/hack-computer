@@ -1,83 +1,67 @@
 class Player {
-	field int x;
-	field int y;
-	field int lastDirection;
 	field int length;
 	field Array bodyParts;
 
 	constructor Player new(int pLastDirection, int px, int py) {
-		let bodyParts = Array.new(100);
-		let length = 0;
-		let x = px;
-		let y = py;
-		let lastDirection = pLastDirection;
+		var int i;
+		let bodyParts = Array.new(500);
 
+		let length = 1;
+		let bodyParts[0] = BodyPart.new(pLastDirection, px, py);
+
+		while(i < 30) {
+			do growBody();
+			let i = i + 1;
+		}
 		return this;
   } 
 
-	method void updatePosition(int pLastDirection, int px, int py) {
+	method void updatePosition(boolean hasEaten, int pLastDirection, int px, int py) {
 		var BodyPart tmp;
 		var int c, newX, newY, previousX, previousY;
-		
-		if (length > 0) {
-			let tmp = bodyParts[0];
-			let previousX = x;
-			let previousY = y;
-			// let previousX = tmp.getX();
-			// let previousY = tmp.getY();
 
-			if (lastDirection = 0) {
-				let newX = previousX - 5;
-				let newY = previousY;
-			} else {
-				let newY = previousY - 5;
-				let newX = previousX;
-			}
-
-			do tmp.updatePosition(newX,  newY);
+		if (hasEaten) {
+			let tmp = bodyParts[length-1];
+			do tmp.updatePosition(pLastDirection, px, py);
+			return;
 		}
 
-		let c = 1;
-		while (c < length) {
-			let tmp = bodyParts[c-1];
-			let previousX = tmp.getX();
-			let previousY = tmp.getY();
+		let bodyParts[length] = bodyParts[0];
 
-			if (lastDirection = 0) {
-				let newX = previousX - 5;
-				let newY = previousY;
-			} else {
-				let newY = previousY - 5;
-				let newX = previousX;
-			}
+		// Latest element is head.
+		let tmp = bodyParts[length];
+		do tmp.updatePosition(pLastDirection, px, py);
 
-			let tmp = bodyParts[c];
-			do tmp.updatePosition(newX,  newY);
-
-			let c = c + 1;
+		// Re-position array elements 
+		let c = 0;
+		while(c < length) {
+				let bodyParts[c] = bodyParts[(c+1)];
+				let c = c+1;
 		}
-
-		let x = px;
-		let y = py;
-		let lastDirection = pLastDirection;
 
 		return;
 	}
 
 	method int getX() {
-		return x;
+		var BodyPart tmp;
+		let tmp = bodyParts[length-1];
+		return tmp.getX();
 	}
 
 	method int getY() {
-		return y;
+		var BodyPart tmp;
+		let tmp = bodyParts[length-1];
+		return tmp.getY();
 	}
 
 	method boolean canEat(Food food) {
-		var int foodX, foodY;
+		var int x, y, foodX, foodY;
 		var boolean b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11;
 
 		let foodX = food.getX();
 		let foodY = food.getY();
+		let x = getX();
+		let y = getY();
 
 		let b1 = x > (foodX - 2);
 		let b2 = x = (foodX - 2);
@@ -104,17 +88,26 @@ class Player {
 	}
 	
 	method void growBody() {
-		var int newX, newY;
+		var int lastDir, oldX, oldY, newX, newY;
+		var BodyPart tmp;
 
-		if (lastDirection = 0) {
-			let newX = x - 10;
-			let newY = y;
+		// Append to latest
+		let tmp = bodyParts[0];
+
+		let oldX = tmp.getX();
+		let oldY = tmp.getY();
+		let lastDir = tmp.getLastDirection();
+
+		if (lastDir = 0) {
+			let newX = oldX - 10;
+			let newY = oldY;
 		} else {
-			let newY = y - 10;
-			let newX = x;
+			let newY = oldY - 10;
+			let newX = oldX;
 		}
 
-		let bodyParts[length] = BodyPart.new(newX, newY);
+		//@TODO: Bug this should be added to index 0, not latest.
+		let bodyParts[length] = BodyPart.new(lastDir, newX, newY);
 		let length = length + 1;
 		return;
 	}
@@ -123,8 +116,7 @@ class Player {
 		var int c;
 		var BodyPart tmp;
 		var int tmpX, tmpY;
-		do Screen.drawRectangle(x, y, x+5, y+5);
-		
+
 		let c = 0;
 		while (c < length) {
 			let tmp = bodyParts[c];
