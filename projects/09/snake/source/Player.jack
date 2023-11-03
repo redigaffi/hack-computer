@@ -1,0 +1,200 @@
+class Player {
+	field int length;
+	field Array bodyParts;
+
+	constructor Player new(int pLastDirection, int px, int py) {
+		var int i;
+		let bodyParts = Array.new(500);
+
+		// Create first body part (which is the head/player)
+		let length = 1;
+		let bodyParts[0] = BodyPart.new(pLastDirection, px, py);
+
+		// Add some initial size when creating the player
+		while(i < 5) {
+			do growBody();
+			let i = i + 1;
+		}
+
+		return this;
+  } 
+
+	method void updatePosition(boolean hasEaten, int pLastDirection, int px, int py) {
+		var BodyPart tmp;
+		var int c, newX, newY, previousX, previousY;
+
+		if (hasEaten) {
+			let tmp = bodyParts[length-1];
+			do tmp.updatePosition(pLastDirection, px, py);
+			return;
+		}
+
+		// Move tail to head with new coordinates
+		let bodyParts[length] = bodyParts[0];
+
+		// Update position to head
+		let tmp = bodyParts[length];
+		do tmp.updatePosition(pLastDirection, px, py);
+
+		// Re-position all elements in the array -1 backwards
+		let c = 0;
+		while(c < length) {
+				let bodyParts[c] = bodyParts[(c+1)];
+				let c = c+1;
+		}
+
+		return;
+	}
+
+	method int getX() {
+		var BodyPart tmp;
+		let tmp = bodyParts[length-1];
+		return tmp.getX();
+	}
+
+	method int getY() {
+		var BodyPart tmp;
+		let tmp = bodyParts[length-1];
+		return tmp.getY();
+	}
+
+	method boolean canEat(Food food) {
+		var int foodSize, x, y, foodX, foodY;
+		var BodyPart head;
+		var boolean b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11;
+
+		let foodX = food.getX();
+		let foodY = food.getY();
+
+		let foodSize = food.getSize();
+		let head = bodyParts[length-1];
+		let x = head.getX();
+		let y = head.getY();
+
+		// Collision detection (split up conditions to make them easier to read)
+		// I added some margins to make it easier to hit the food, see the -2 or +2 constants
+		let b1 = x > (foodX - 2);
+		let b2 = x = (foodX - 2);
+
+		let b3 = x < (foodX + (foodSize + 2));
+		let b4 = x = (foodX  + (foodSize + 2));
+
+		let b5 = (b1 | b2) & (b3 | b4);
+
+		let b6 = y > (foodY - 2);
+		let b7 = y = (foodY - 2);
+
+		let b8 = y < (foodY + (foodSize + 2));
+		let b9 = y = (foodY  + (foodSize + 2));
+
+		let b10 = (b6 | b7) & (b8 | b9);
+		let b11 = b5 & b10;
+
+		if (b11) {
+			return true;
+		}
+
+		return false;
+	}
+
+	method boolean collidesWithBody() {
+		var int bx, by, x, y, i;
+		var BodyPart head, tmp;
+		var boolean b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11;
+
+		let head = bodyParts[length-1];
+		let x = head.getX();
+		let y = head.getY();
+		let i = 0;
+
+		while (i < (length-2)) {
+				let tmp = bodyParts[i];
+				let bx = tmp.getX();
+				let by = tmp.getY();
+
+				let b1 = x > (bx);
+				let b2 = x = (bx);
+
+				let b3 = x < (bx + 3);
+				let b4 = x = (bx + 3);
+
+				let b5 = (b1 | b2) & (b3 | b4);
+
+				let b6 = y > (by);
+				let b7 = y = (by);
+
+				let b8 = y < (by + 3);
+				let b9 = y = (by + 3);
+
+				let b10 = (b6 | b7) & (b8 | b9);
+				let b11 = b5 & b10;
+
+				if (b11) {
+					return true;
+				}
+
+				let i = i + 1;
+		}
+
+		return false;
+	}
+	
+	method boolean collidesWithEdge(int x, int y) {
+
+		if (x < 0 | y < 0) {
+			return true;
+		}
+
+		return false;
+
+	}
+
+	method void growBody() {
+		var int c, lastDir, oldX, oldY, newX, newY;
+		var BodyPart tmp;
+
+		// We append our new piece of body at the end, taking as reference the latest body part
+		let tmp = bodyParts[0];
+
+		let oldX = tmp.getX();
+		let oldY = tmp.getY();
+		let lastDir = tmp.getLastDirection();
+
+		if (lastDir = 0) {
+			let newX = oldX - 7;
+			let newY = oldY;
+		} else {
+			let newY = oldY - 7;
+			let newX = oldX;
+		}
+
+		// Reposition all elements in the array +1 forward
+		let c = length;
+		while (c > 0) {
+			let bodyParts[c] = bodyParts[c-1];
+			let c = c - 1;
+		}
+
+		// Add new body part to the end (beggining)
+		let bodyParts[0] = BodyPart.new(lastDir, newX, newY);
+		let length = length + 1;
+		return;
+	}
+
+	method void draw() {
+		var int c;
+		var BodyPart tmp;
+		var int tmpX, tmpY;
+
+		let c = 0;
+		while (c < length) {
+			let tmp = bodyParts[c];
+			let tmpX = tmp.getX();
+			let tmpY = tmp.getY();
+			do Screen.drawRectangle(tmpX, tmpY, tmpX+5, tmpY+5);
+			let c = c + 1;
+		}
+
+		return;
+	}
+}

@@ -20,7 +20,7 @@ push temp 0
 pop that 0
 label WHILE_EXP0
 push local 0
-push constant 30
+push constant 5
 lt
 not
 if-goto WHILE_END0
@@ -141,103 +141,21 @@ pop local 0
 push local 0
 call BodyPart.getY 1
 return
-function Player.canEat 15
+function Player.canEat 17
 push argument 0
 pop pointer 0
 push argument 1
 call Food.getX 1
-pop local 2
+pop local 3
 push argument 1
 call Food.getY 1
-pop local 3
-push pointer 0
-call Player.getX 1
-pop local 0
-push pointer 0
-call Player.getY 1
-pop local 1
-push local 0
-push local 2
-push constant 2
-sub
-gt
 pop local 4
-push local 0
-push local 2
-push constant 2
+push argument 1
+call Food.getSize 1
+pop local 0
+push this 0
+push constant 1
 sub
-eq
-pop local 5
-push local 0
-push local 2
-push constant 7
-add
-lt
-pop local 6
-push local 0
-push local 2
-push constant 7
-add
-eq
-pop local 7
-push local 4
-push local 5
-or
-push local 6
-push local 7
-or
-and
-pop local 8
-push local 1
-push local 3
-push constant 2
-sub
-gt
-pop local 9
-push local 1
-push local 3
-push constant 2
-sub
-eq
-pop local 10
-push local 1
-push local 3
-push constant 7
-add
-lt
-pop local 11
-push local 1
-push local 3
-push constant 7
-add
-eq
-pop local 12
-push local 9
-push local 10
-or
-push local 11
-push local 12
-or
-and
-pop local 13
-push local 8
-push local 13
-and
-pop local 14
-push local 14
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push constant 0
-not
-return
-label IF_FALSE0
-push constant 0
-return
-function Player.growBody 6
-push argument 0
-pop pointer 0
-push constant 0
 push this 1
 add
 pop pointer 1
@@ -249,36 +167,299 @@ pop local 1
 push local 5
 call BodyPart.getY 1
 pop local 2
-push local 5
-call BodyPart.getLastDirection 1
-pop local 0
+push local 1
+push local 3
+push constant 2
+sub
+gt
+pop local 6
+push local 1
+push local 3
+push constant 2
+sub
+eq
+pop local 7
+push local 1
+push local 3
 push local 0
+push constant 2
+add
+add
+lt
+pop local 8
+push local 1
+push local 3
+push local 0
+push constant 2
+add
+add
+eq
+pop local 9
+push local 6
+push local 7
+or
+push local 8
+push local 9
+or
+and
+pop local 10
+push local 2
+push local 4
+push constant 2
+sub
+gt
+pop local 11
+push local 2
+push local 4
+push constant 2
+sub
+eq
+pop local 12
+push local 2
+push local 4
+push local 0
+push constant 2
+add
+add
+lt
+pop local 13
+push local 2
+push local 4
+push local 0
+push constant 2
+add
+add
+eq
+pop local 14
+push local 11
+push local 12
+or
+push local 13
+push local 14
+or
+and
+pop local 15
+push local 10
+push local 15
+and
+pop local 16
+push local 16
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
+function Player.collidesWithBody 18
+push argument 0
+pop pointer 0
+push this 0
+push constant 1
+sub
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 5
+push local 5
+call BodyPart.getX 1
+pop local 2
+push local 5
+call BodyPart.getY 1
+pop local 3
+push constant 0
+pop local 4
+label WHILE_EXP0
+push local 4
+push this 0
+push constant 2
+sub
+lt
+not
+if-goto WHILE_END0
+push local 4
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 6
+push local 6
+call BodyPart.getX 1
+pop local 0
+push local 6
+call BodyPart.getY 1
+pop local 1
+push local 2
+push local 0
+gt
+pop local 7
+push local 2
+push local 0
+eq
+pop local 8
+push local 2
+push local 0
+push constant 3
+add
+lt
+pop local 9
+push local 2
+push local 0
+push constant 3
+add
+eq
+pop local 10
+push local 7
+push local 8
+or
+push local 9
+push local 10
+or
+and
+pop local 11
+push local 3
+push local 1
+gt
+pop local 12
+push local 3
+push local 1
+eq
+pop local 13
+push local 3
+push local 1
+push constant 3
+add
+lt
+pop local 14
+push local 3
+push local 1
+push constant 3
+add
+eq
+pop local 15
+push local 12
+push local 13
+or
+push local 14
+push local 15
+or
+and
+pop local 16
+push local 11
+push local 16
+and
+pop local 17
+push local 17
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push local 4
+push constant 1
+add
+pop local 4
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
+function Player.collidesWithEdge 0
+push argument 0
+pop pointer 0
+push argument 1
+push constant 0
+lt
+push argument 2
+or
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+return
+label IF_FALSE0
+push constant 0
+return
+function Player.growBody 7
+push argument 0
+pop pointer 0
+push constant 0
+push this 1
+add
+pop pointer 1
+push that 0
+pop local 6
+push local 6
+call BodyPart.getX 1
+pop local 2
+push local 6
+call BodyPart.getY 1
+pop local 3
+push local 6
+call BodyPart.getLastDirection 1
+pop local 1
+push local 1
 push constant 0
 eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push local 1
-push constant 10
-sub
-pop local 3
 push local 2
+push constant 7
+sub
 pop local 4
+push local 3
+pop local 5
 goto IF_END0
 label IF_FALSE0
-push local 2
-push constant 10
+push local 3
+push constant 7
 sub
+pop local 5
+push local 2
 pop local 4
-push local 1
-pop local 3
 label IF_END0
 push this 0
+pop local 0
+label WHILE_EXP0
+push local 0
+push constant 0
+gt
+not
+if-goto WHILE_END0
+push local 0
 push this 1
 add
 push local 0
-push local 3
+push constant 1
+sub
+push this 1
+add
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push local 0
+push constant 1
+sub
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+push this 1
+add
+push local 1
 push local 4
+push local 5
 call BodyPart.new 3
 pop temp 0
 pop pointer 1

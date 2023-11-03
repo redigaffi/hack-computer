@@ -1,0 +1,141 @@
+class Main {
+	 function int userInputToGenerateEntropy() {
+				var int entropy, i, entropyDataLength;
+				var String entropyData;
+
+				let entropyData = Keyboard.readLine("Input random letters to generate entropy: ");
+
+				let entropy = 0;
+				let entropyDataLength = entropyData.length();
+
+				while (i < entropyDataLength)	{
+					let entropy = entropy + entropyData.charAt(i);
+					let i = i + 1;
+				}
+
+				return entropy;
+	 }
+
+
+	 function void lost() { 
+			do Output.printString("You lost!");
+			return;
+	 }
+
+   function void main() {
+				var Player player;
+				var boolean exit, hasEaten, collideWithBody;
+				var char keyPressed, lastKeyPressed;
+				var String entropyData;
+				var int secondsElapsedFood, frames, entropy, foodSize, i, x, y, lastDirection, lastSpeed;
+				var Food food;
+
+				let exit = false;
+				let lastSpeed = 7;
+				let lastDirection = 0;
+				let x = 50;
+				let y = 50;
+				let frames = 0;
+				let secondsElapsedFood = 0;
+
+				let entropy = Main.userInputToGenerateEntropy();
+
+				let player = Player.new(lastDirection, x, y);
+				let food = Food.new(entropy);
+
+				while (~exit) { 
+					do Screen.clearScreen();
+					do player.draw();
+					do food.draw();
+
+					// Every ~25s (in reality its 20s but as I stated at the bottom, its okay) 
+					// move food randomly, to make it more challenging
+					if (secondsElapsedFood = 25) {
+						let secondsElapsedFood = 0;
+						do food.dispose();
+						let entropy = entropy + 1;
+						let food = Food.new(entropy);
+					}
+
+					// Collision with itself looses game
+					let collideWithBody = player.collidesWithBody();
+					if (collideWithBody) {
+						do Main.lost();
+						do Sys.halt();
+					}
+
+					let hasEaten = player.canEat(food);
+					if (hasEaten) {
+						let foodSize = food.getSize();
+						
+						// Grow body N times, where N equals food size
+						let i = 0;
+						while (i < foodSize) {
+							do player.growBody();
+							let i = i + 1;
+						}
+
+						do food.dispose();
+						let entropy = entropy + 1;
+						let food = Food.new(entropy);
+						let hasEaten = false;
+					}
+
+					let keyPressed = Keyboard.keyPressed();
+
+					// left (don't allow move in opposite direction to avoid superpositioning)
+					if (keyPressed = 130 & ~(lastKeyPressed = 132)) {
+						let lastKeyPressed = 130;
+						let lastDirection = 0;
+						let lastSpeed = -7;
+					}
+
+					// right (don't allow move in opposite direction to avoid superpositioning)
+					if (keyPressed = 132 & ~(lastKeyPressed = 130)) {
+						let lastKeyPressed = 132;
+						let lastDirection = 0;
+						let lastSpeed = 7;
+					}
+			
+					// up (don't allow move in opposite direction to avoid superpositioning)
+					if (keyPressed = 131 & ~(lastKeyPressed = 133)) {
+						let lastKeyPressed = 131;
+						let lastDirection = 1;
+						let lastSpeed = -7;
+					}
+
+					// down (don't allow move in opposite direction to avoid superpositioning)
+					if (keyPressed = 133 & ~(lastKeyPressed = 131)) {
+						let lastKeyPressed = 133;
+						let lastDirection = 1;
+						let lastSpeed = 7;
+					}
+
+					// To which direction do we grow the tail
+					if (lastDirection = 0) {
+						let x = player.getX() + lastSpeed;
+					} else {
+						let y = player.getY() + lastSpeed;
+					}
+
+					// If player with screen boundaries he looses
+					if (player.collidesWithEdge(x, y)) {
+						do Main.lost();
+						do Sys.halt();
+					}
+
+					do player.updatePosition(hasEaten, lastDirection, x, y);
+
+					// 1,25 fps (1000ms / 800ms sleep = 1,25 fps)
+					do Sys.wait(800);
+
+					// For every frame *almost* a second passed.
+					// In this environment, its nothing critical,
+					// we can safely ignore the resting 200ms.
+					let secondsElapsedFood = secondsElapsedFood + 1;
+					
+				}
+
+				return;
+   }
+}

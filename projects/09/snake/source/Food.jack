@@ -1,10 +1,12 @@
 class Food {
 	field int x;
 	field int y;
+	field int size;
 
 	constructor Food new(int entropy) {
 		let x = Random.lcg(entropy, 20, 400);
 		let y = Random.lcg(entropy, 20, 200);
+		let size = Random.lcg(entropy, 5, 10);
 		return this;
   } 
 
@@ -16,8 +18,12 @@ class Food {
 		return y;
 	}
 
+	method int getSize() {
+		return size;
+	}
+
 	method void draw() {
-		do Screen.drawRectangle(x, y, x+5, y+5);
+		do Screen.drawRectangle(x, y, x+size, y+size);
 		return;
 	}
 
