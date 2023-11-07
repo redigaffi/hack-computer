@@ -7,7 +7,8 @@
 class Main {
    function void main() {
 			var char a;
-			let a='a';
+			var char a_b;
+			let a=10;
 			do Output.moveCursor(2, 0);
       return;
    }
