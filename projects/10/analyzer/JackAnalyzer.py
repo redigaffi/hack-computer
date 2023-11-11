@@ -1,6 +1,7 @@
 import sys
 import re
 from JackTokenizer import JackTokenizer
+from CompilationEngine import CompilationEngine
 
 def load_file(path) -> list[str]:
     data = ""
@@ -22,6 +23,7 @@ if __name__ == "__main__":
     file = sys.argv[1]
     data = load_file(file)
     tokenizer = JackTokenizer(data)
+    compilation_engine =  CompilationEngine(tokenizer)
     with open("output.xml", "w+") as f:
         f.write(tokenizer.as_xml())
 

@@ -15,7 +15,6 @@ class BaseEnum(StrEnum, metaclass=MetaEnum):
     pass
 
 class Keyword(BaseEnum):
-
     @classmethod
     def max_length(cls):
         max_length = 0
@@ -68,7 +67,7 @@ class Symbol(BaseEnum):
     TILDE = '~'
 
 class TokenType(StrEnum):
-    KEYYWORD = 'keyword'
+    KEYWORD = 'keyword'
     SYMBOL = 'symbol'
     IDENTIFIER = 'identifier'
     INT_CONST = 'int_const'
@@ -90,10 +89,8 @@ class JackTokenizer:
         except:
             return None
 
-
     @staticmethod
     def is_symbol(char_pointer, data):
-        char = data[char_pointer]
         char = JackTokenizer.get_char(char_pointer, data)
         if char in Symbol:
             return char_pointer+1, Token(TokenType.SYMBOL, char), True
@@ -117,7 +114,7 @@ class JackTokenizer:
             i += 1
             
         if tmp in Keyword:
-            return char_pointer+i, Token(TokenType.KEYYWORD, tmp), True
+            return char_pointer+i, Token(TokenType.KEYWORD, tmp), True
 
         return char_pointer, None, False 
 
@@ -165,6 +162,7 @@ class JackTokenizer:
             char = JackTokenizer.get_char(char_pointer+i, data)
 
         try:
+            #TODO: Boundaries check
             num = int(tmp)
         except:
             return char_pointer, None, False
@@ -194,67 +192,68 @@ class JackTokenizer:
         
     def __init__(self, data: str):
         char_pointer = 0
+        tokenizing_functions = [
+            JackTokenizer.is_symbol,
+            JackTokenizer.is_keyword,
+            JackTokenizer.is_string_const,
+            JackTokenizer.is_int_const,
+            JackTokenizer.is_identifier
+        ]
+
         while char_pointer < len(data):
             if JackTokenizer.get_char(char_pointer, data) == " ":
                 char_pointer += 1
                 continue
 
-            char_pointer, token, is_sym = JackTokenizer.is_symbol(char_pointer, data)
-            if is_sym:
-                self.tokens.append(token)
-                continue
-            else:
-                char_pointer, token, is_key = JackTokenizer.is_keyword(char_pointer, data)
-                if is_key:
-                    self.tokens.append(token)
-                    continue
-                else:
-                    char_pointer, token, is_str = JackTokenizer.is_string_const(char_pointer, data)
-                    if is_str:
-                        self.tokens.append(token)
-                        continue
-                    else:
-                        char_pointer, token, is_int = JackTokenizer.is_int_const(char_pointer, data)
-                        if is_int:
-                            self.tokens.append(token)
-                            continue
-                        else:
-                            char_pointer, token, is_iden = JackTokenizer.is_identifier(char_pointer, data)
-                            if is_iden:
-                                self.tokens.append(token)
-                                continue
+            for tokenizing_function in tokenizing_functions:
+                result = tokenizing_function(char_pointer, data)
+                if result[2]:
+                    self.tokens.append(result[1])
+                    char_pointer = result[0]
+                    break
 
             if char_pointer == len(data)-1:
                 break
 
     def has_more_tokens(self) -> bool:
-        return False
+        return self.token_pointer < len(self.tokens)
 
     def advance(self):
-        pass
+        self.token_pointer += 1
+        self.current_token = self.tokens[self.token_pointer]
 
-    def token_type(self):
-        pass
+    def token_type(self) -> TokenType:
+        return self.tokens[self.token_pointer].token_type
 
-    def keyword(self):
-        pass
+    def keyword(self) -> Keyword:
+        current_token = self.tokens[self.token_pointer]
+        assert current_token in Keyword, "Current token not a keyword"
+        return current_token
 
     def symbol(self):
-        pass
+        current_token = self.tokens[self.token_pointer]
+        assert current_token in Symbol, "Current token not a symbol"
+        return current_token
 
     def identifier(self) -> str:
-        pass
+        current_token = self.tokens[self.token_pointer]
+        assert current_token.token_type == TokenType.IDENTIFIER, "Current token not a identifier"
+        return current_token
 
     def int_val(self) -> int:
-        pass
+        current_token = self.tokens[self.token_pointer]
+        assert current_token.token_type == TokenType.INT_CONST, "Current token not a int_const"
+        return current_token
 
     def string_val(self) -> str:
-        pass
+        current_token = self.tokens[self.token_pointer]
+        assert current_token.token_type == TokenType.STRING_CONST, "Current token not a string_const"
+        return current_token
 
     def as_xml(self):
         output = """<tokens>\n"""
         for token in self.tokens:
-            if token.token_type == TokenType.KEYYWORD:
+            if token.token_type == TokenType.KEYWORD:
                 output += f"""<keyword> {token.token} </keyword>\n"""
             elif token.token_type == TokenType.IDENTIFIER:
                 output += f"""<identifier> {token.token} </identifier>\n"""
