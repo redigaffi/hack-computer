@@ -5,11 +5,11 @@
 
 /** Hello World program. */
 class Main {
+	function int main1() {
+		return 5;
+	}
    function void main() {
-			var char a;
-			var char a_b;
-			let a=10;
-			do Output.moveCursor(2, 0);
+			do Output.moveCursor(Main.main1(), 0);
       return;
    }
 }

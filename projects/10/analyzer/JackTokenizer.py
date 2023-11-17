@@ -66,7 +66,7 @@ class Symbol(BaseEnum):
     EQUALS = '='
     TILDE = '~'
 
-class TokenType(StrEnum):
+class TokenType(BaseEnum):
     KEYWORD = 'keyword'
     SYMBOL = 'symbol'
     IDENTIFIER = 'identifier'
@@ -200,7 +200,8 @@ class JackTokenizer:
             JackTokenizer.is_identifier
         ]
 
-        while char_pointer < len(data):
+        length = len(data)
+        while char_pointer < length:
             if JackTokenizer.get_char(char_pointer, data) == " ":
                 char_pointer += 1
                 continue
@@ -212,11 +213,8 @@ class JackTokenizer:
                     char_pointer = result[0]
                     break
 
-            if char_pointer == len(data)-1:
-                break
-
     def has_more_tokens(self) -> bool:
-        return self.token_pointer < len(self.tokens)
+        return self.token_pointer < len(self.tokens)-1
 
     def advance(self):
         self.token_pointer += 1
@@ -274,6 +272,3 @@ class JackTokenizer:
 
         output += """</tokens>"""
         return output
-
-
-

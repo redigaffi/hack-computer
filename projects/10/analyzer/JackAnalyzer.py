@@ -24,6 +24,6 @@ if __name__ == "__main__":
     data = load_file(file)
     tokenizer = JackTokenizer(data)
     compilation_engine =  CompilationEngine(tokenizer)
-    with open("output.xml", "w+") as f:
-        f.write(tokenizer.as_xml())
+    # with open("output.xml", "w+") as f:
+    #     f.write(tokenizer.as_xml())
 
