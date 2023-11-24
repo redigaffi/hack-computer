@@ -63,10 +63,6 @@ class CompilationEngine:
         elif self.current_token.token in ["-", "~"]:
             self._process(["-", "~"])
             self.compile_term()
-            # self._process([TokenType.INT_CONST,
-            #            TokenType.STRING_CONST,
-            #            TokenType.IDENTIFIER,
-            #            *[keyword for keyword in Keyword]])
         else:
             self._process([TokenType.INT_CONST,
                            TokenType.STRING_CONST,
