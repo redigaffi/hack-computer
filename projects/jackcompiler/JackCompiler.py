@@ -3,6 +3,7 @@ import re
 from JackTokenizer import JackTokenizer
 from CompilationEngine import CompilationEngine
 from VMWriter import VMWriter
+import os
 
 def load_file(path) -> list[str]:
     data = ""
@@ -20,11 +21,23 @@ def load_file(path) -> list[str]:
         data = re.sub(r"/\*\*(.*?)\*/", "", data)
         return data
 
-if __name__ == "__main__":
-    file = sys.argv[1]
-    data = load_file(file)
+def compile_file(input, file_name):
+    data = load_file(input)
     tokenizer = JackTokenizer(data)
-    with open("output.vm", "w+") as f:
+    with open(f"{file_name}.vm", "w+") as f:
         vm_writer = VMWriter(f)
         compilation_engine = CompilationEngine(tokenizer, vm_writer)
 
+if __name__ == "__main__":
+    path = sys.argv[1]
+    if os.path.isdir(path):
+        files = os.listdir(path)
+        for file in files:
+            name, extension = file.split(".")
+            if extension != "jack":
+                continue
+
+            compile_file(f"{path}/{file}", f"{path}/{name}")
+    else:
+        name, extension = path.split(".")
+        compile_file(path, name)
