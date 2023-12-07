@@ -127,6 +127,9 @@ class CompilationEngine:
                 self.vm_writer.writeArithmetic(Command.NOT)
             elif self.current_token.token == Keyword.THIS:
                 self.vm_writer.writePush(Segment.POINTER, 0)
+            elif self.current_token.token == Keyword.NULL:
+                self.vm_writer.writePush(Segment.CONSTANT, 0)
+
             self._process([*[keyword for keyword in Keyword]])
         elif self.current_token.token_type == TokenType.STRING_CONST:
             str_length = len(self.current_token.token)
@@ -266,13 +269,15 @@ class CompilationEngine:
             self._process(["]"])
             # self.vm_writer.writePush(Segment.TEMP, 0)
             self.vm_writer.writeArithmetic(Command.ADD)
-            self.vm_writer.writePop(Segment.POINTER, 1)
             
         self._process([Symbol.EQUALS])
         self.compile_expression()
         self._process([Symbol.SEMICOLON])
 
         if is_array:
+            self.vm_writer.writePop(Segment.TEMP, 0)
+            self.vm_writer.writePop(Segment.POINTER, 1)
+            self.vm_writer.writePush(Segment.TEMP, 0)
             self.vm_writer.writePop(Segment.THAT, 0)
             return
 
