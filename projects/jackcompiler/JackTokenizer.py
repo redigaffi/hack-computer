@@ -103,16 +103,17 @@ class JackTokenizer:
         max_keyword_length = Keyword.max_length()
 
         i = 0
-        while tmp not in Keyword and len(tmp) < max_keyword_length:
-            char = JackTokenizer.get_char(i+char_pointer, data)
+        # while tmp not in Keyword and len(tmp) < max_keyword_length:
+        char = JackTokenizer.get_char(i+char_pointer, data)
+        while char.isalpha() and len(tmp) < max_keyword_length:
             if not char:
                 break
-            if char == " ":
-                i += 1
-                continue
             tmp += char
             i += 1
+            char = JackTokenizer.get_char(i+char_pointer, data)
             
+        next_char = JackTokenizer.get_char(i+char_pointer+1, data)
+        # if tmp in Keyword and next_char == " ":
         if tmp in Keyword:
             return char_pointer+i, Token(TokenType.KEYWORD, tmp), True
 
@@ -191,6 +192,9 @@ class JackTokenizer:
         return char_pointer+i, Token(TokenType.IDENTIFIER, tmp), True
         
     def __init__(self, data: str):
+        self.tokens = []
+        self.token_pointer = 0
+
         char_pointer = 0
         tokenizing_functions = [
             JackTokenizer.is_symbol,

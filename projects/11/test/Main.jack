@@ -1,0 +1,9 @@
+class Main {
+		 function void main() {
+				var Array a, b;
+        let a = Array.new(10);
+        let a[0] = 5;
+				let a[a[0]] = 10;
+				return;
+			}
+}

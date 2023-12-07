@@ -1,0 +1,17 @@
+class Square {
+		field int a;
+		static Square instance, instance1;
+		constructor Square new() {
+				return this;
+    }
+
+		function void newInstance() {
+			let instance = Square.new();
+			let instance1 = instance;
+			return;
+		}
+
+		function Square getInstance() {
+			return instance;
+		}
+}

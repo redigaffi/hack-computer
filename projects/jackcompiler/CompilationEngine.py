@@ -1,6 +1,5 @@
 from JackTokenizer import Token, JackTokenizer, TokenType, Keyword, Symbol
 from typing import Optional, List
-import xml.etree.ElementTree as ET
 from SymbolTable import SymbolTable, VarKind
 from VMWriter import VMWriter, Segment, Command
 from pprint import pprint
@@ -9,6 +8,7 @@ class CompilationEngine:
     def __init__(self, tokenizer: JackTokenizer, vm_writer: VMWriter):
         self.current_class_name = None
         self.current_subroutine_name = None
+        self.current_subroutine_type = None
         self.has_subroutine_return = False
         self.labels = []
 
@@ -34,13 +34,6 @@ class CompilationEngine:
             return self.method_level_symbol_table
 
     def _process_identifier(self, name: str, category: str, index: int, declaring: bool):
-        # self.output += f"<identifier>"
-        # self.output += f"<name> {name} </name>"
-        # self.output += f"<category> {category} </category>"
-        # self.output += f"<index> {index} </index>"
-        # self.output += f"<usage> {'declaring' if declaring else 'usage'} </usage>"
-        # self.output += f"</identifier>"
-
         if self.tokenizer.has_more_tokens():
             self.tokenizer.advance()
             self.current_token: Token = self.tokenizer.tokens[self.tokenizer.token_pointer]
@@ -75,11 +68,25 @@ class CompilationEngine:
         if self.current_token.token_type == TokenType.IDENTIFIER and self.look_ahead_by(1).token == "[":
             var_name = self.get_x_previous_token(0).token
             sbt = self.get_symbol_table_for_var(var_name)
-            self._process_identifier(var_name, sbt.kind_of(var_name), sbt.index_of(var_name), False)
-            # self._process([TokenType.IDENTIFIER])
+            var_kind, index = sbt.kind_of(var_name), sbt.index_of(var_name)
+            mapping = {
+                VarKind.ARG: Segment.ARGUMENT,
+                VarKind.VAR: Segment.LOCAL,
+                VarKind.FIELD: Segment.THIS,
+                VarKind.STATIC: Segment.STATIC,
+            }
+
+
+            self.vm_writer.writePush(mapping.get(var_kind), index)
+            self._process([TokenType.IDENTIFIER])
             self._process(["["])
             self.compile_expression()
             self._process(["]"])
+
+            self.vm_writer.writeArithmetic(Command.ADD)
+            self.vm_writer.writePop(Segment.POINTER, 1)
+            self.vm_writer.writePush(Segment.THAT, 0)
+
         elif self.current_token.token_type == TokenType.IDENTIFIER and self.look_ahead_by(1).token in ["(", "."]:
             self.compile_subroutine_call()
         elif self.current_token.token == "(":
@@ -93,14 +100,16 @@ class CompilationEngine:
         elif self.current_token.token == "-":
             self._process(["-"])
             self.compile_term()
+            self.vm_writer.writeArithmetic(Command.NEG)
         elif self.current_token.token_type == TokenType.IDENTIFIER:
             var_name = self.get_x_previous_token(0).token
             sbt = self.get_symbol_table_for_var(var_name)
-            # self._process_identifier(var_name, sbt.kind_of(var_name), sbt.index_of(var_name), False)
             self._process([TokenType.IDENTIFIER])
             mapping = {
                 VarKind.ARG: Segment.ARGUMENT,
                 VarKind.VAR: Segment.LOCAL,
+                VarKind.FIELD: Segment.THIS,
+                VarKind.STATIC: Segment.STATIC,
             }
 
             var_kind, index = sbt.kind_of(var_name), sbt.index_of(var_name)
@@ -111,14 +120,23 @@ class CompilationEngine:
             self.vm_writer.writePush(Segment.CONSTANT, self.current_token.token)
             self._process([TokenType.INT_CONST])
         elif self.current_token.token_type == TokenType.KEYWORD:
-            if self.current_token.token == "false":
-                self.vm_writer.writePush(Segment.CONSTANT, "0")
-            elif self.current_token.token == "true":
-                self.vm_writer.writePush(Segment.CONSTANT, "0")
+            if self.current_token.token == Keyword.FALSE:
+                self.vm_writer.writePush(Segment.CONSTANT, 0)
+            elif self.current_token.token == Keyword.TRUE:
+                self.vm_writer.writePush(Segment.CONSTANT, 0)
                 self.vm_writer.writeArithmetic(Command.NOT)
-
+            elif self.current_token.token == Keyword.THIS:
+                self.vm_writer.writePush(Segment.POINTER, 0)
             self._process([*[keyword for keyword in Keyword]])
-        else:
+        elif self.current_token.token_type == TokenType.STRING_CONST:
+            str_length = len(self.current_token.token)
+            self.vm_writer.writePush(Segment.CONSTANT, str_length)
+            self.vm_writer.writeCall("String.new", 1)
+            self.vm_writer.writePop(Segment.TEMP, 0)
+            for char in self.current_token.token:
+                self.vm_writer.writePush(Segment.TEMP, 0)
+                self.vm_writer.writePush(Segment.CONSTANT, ord(char))
+                self.vm_writer.writeCall("String.appendChar", 2)
             self._process([TokenType.STRING_CONST])
 
     def compile_expression(self):
@@ -166,8 +184,8 @@ class CompilationEngine:
         available_types = ["int", "char", "boolean", "void"]
         if self.current_token.token not in available_types:
             var_name = self.get_x_previous_token(0).token
-            self._process_identifier(var_name, "class", -1, False)
-            # self._process([TokenType.IDENTIFIER])
+            # self._process_identifier(var_name, "class", -1, False)
+            self._process([TokenType.IDENTIFIER])
             return
         self._process(available_types)
 
@@ -180,8 +198,8 @@ class CompilationEngine:
             var_kind = self.get_x_previous_token(2).token
             self.class_level_symbol_table.define(var_name, var_type, var_kind)
             index = self.get_symbol_table_for_var(var_name).index_of(var_name)
-            # self._process([TokenType.IDENTIFIER])
-            self._process_identifier(var_name, var_kind, index, True)
+            self._process([TokenType.IDENTIFIER])
+            # self._process_identifier(var_name, var_kind, index, True)
 
             if self.current_token.token == ",":
                 while self.current_token.token != ";":
@@ -189,8 +207,8 @@ class CompilationEngine:
                     var_name = self.get_x_previous_token(0).token
                     self.class_level_symbol_table.define(var_name, var_type, var_kind)
                     index = self.get_symbol_table_for_var(var_name).index_of(var_name)
-                    self._process_identifier(var_name, var_kind, index, True)
-                    # self._process([TokenType.IDENTIFIER])
+                    # self._process_identifier(var_name, var_kind, index, True)
+                    self._process([TokenType.IDENTIFIER])
 
             self._process([";"])
 
@@ -228,24 +246,36 @@ class CompilationEngine:
 
         var_name = self.get_x_previous_token(0).token
         sbt: SymbolTable = self.get_symbol_table_for_var(var_name)
+        var_kind, index = sbt.kind_of(var_name), sbt.index_of(var_name)
         self._process([TokenType.IDENTIFIER])
-
-        # Array access
-        if self.current_token.token == "[":
-            self._process(["["])
-            self.compile_expression()
-            self._process(["]"])
-
-        self._process([Symbol.EQUALS])
-        self.compile_expression()
-        self._process([Symbol.SEMICOLON])
 
         mapping = {
             VarKind.ARG: Segment.ARGUMENT,
             VarKind.VAR: Segment.LOCAL,
+            VarKind.FIELD: Segment.THIS,
+            VarKind.STATIC: Segment.STATIC,
         }
 
-        var_kind, index = sbt.kind_of(var_name), sbt.index_of(var_name)
+        # Array access
+        is_array = False
+        if self.current_token.token == "[":
+            is_array = True 
+            self.vm_writer.writePush(mapping.get(var_kind), index)
+            self._process(["["])
+            self.compile_expression()
+            self._process(["]"])
+            # self.vm_writer.writePush(Segment.TEMP, 0)
+            self.vm_writer.writeArithmetic(Command.ADD)
+            self.vm_writer.writePop(Segment.POINTER, 1)
+            
+        self._process([Symbol.EQUALS])
+        self.compile_expression()
+        self._process([Symbol.SEMICOLON])
+
+        if is_array:
+            self.vm_writer.writePop(Segment.THAT, 0)
+            return
+
         if var_kind in mapping:
             self.vm_writer.writePop(mapping.get(var_kind), index)
 
@@ -297,22 +327,34 @@ class CompilationEngine:
         return expression_amount
 
     def compile_subroutine_call(self):
-                # self._process([TokenType.IDENTIFIER])
         if self.look_ahead_by(1).token == "(":
             function_name = self.get_x_previous_token(0).token
             self._process([TokenType.IDENTIFIER])
             self._process([Symbol.LEFT_PARENTHESIS])
+            self.vm_writer.writePush(Segment.POINTER, 0)
             param_amount = self.compile_expression_list()
             self._process([Symbol.RIGHT_PARENTHESIS])
-            self.vm_writer.writeCall(f"{function_name}", param_amount)
+            self.vm_writer.writeCall(f"{self.current_class_name}.{function_name}", param_amount+1)
         elif self.look_ahead_by(1).token == ".":
             class_name = self.get_x_previous_token(0).token
+            sbt: SymbolTable = self.get_symbol_table_for_var(class_name)
+            param_amount = 0
+            if sbt is not None:
+                param_amount = 1
+                segment, index, class_name = sbt.kind_of(class_name), sbt.index_of(class_name), sbt.type_of(class_name)
+                mapping = {
+                    VarKind.ARG: Segment.ARGUMENT,
+                    VarKind.VAR: Segment.LOCAL,
+                    VarKind.FIELD: Segment.THIS,
+                }
+                self.vm_writer.writePush(mapping.get(segment), index)
+
             self._process([TokenType.IDENTIFIER])
             self._process([Symbol.PERIOD])
             method_name = self.get_x_previous_token(0).token
             self._process([TokenType.IDENTIFIER])
             self._process([Symbol.LEFT_PARENTHESIS])
-            param_amount = self.compile_expression_list()
+            param_amount += self.compile_expression_list()
             self._process([Symbol.RIGHT_PARENTHESIS])
             self.vm_writer.writeCall(f"{class_name}.{method_name}", param_amount)
             # self.vm_writer.writePop(Segment.TEMP, 0)
@@ -320,6 +362,7 @@ class CompilationEngine:
     def compile_do(self):
         self._process([Keyword.DO])
         self.compile_subroutine_call()
+        # Do statement ignore return value 
         self.vm_writer.writePop(Segment.TEMP, 0)
         self._process([Symbol.SEMICOLON])
 
@@ -355,34 +398,45 @@ class CompilationEngine:
     def compile_subroutine_body(self, func_name: str):
         self._process(["{"])
         self.compile_var_decl()
+
         self.vm_writer.writeFunction(f"{self.current_class_name}.{func_name}", self.method_level_symbol_table.var_count(VarKind.VAR))
+        if self.current_subroutine_type == "constructor":
+            # Find a block of memory with enough space to hold current object
+            field_var_count = self.class_level_symbol_table.var_count(VarKind.FIELD)
+            self.vm_writer.writePush(Segment.CONSTANT, field_var_count)
+            self.vm_writer.writeCall("Memory.alloc", 1)
+            self.vm_writer.writePop(Segment.POINTER, 0)
+        elif self.current_subroutine_type == "method":
+            # Set current object (this)
+            self.vm_writer.writePush(Segment.ARGUMENT, 0)
+            self.vm_writer.writePop(Segment.POINTER, 0)
+
         self.compile_statements()
-        # self.compile_return()
         self._process(["}"])
         assert self.has_subroutine_return, "Subroutine has no return statement"
 
     def compile_subroutine_dec(self):
-        class_name = self.tokenizer.tokens[1].token
-
         while self.current_token.token in ["function", "constructor", "method"]:
+            self.current_subroutine_type = self.current_token.token
+            subroutine_type = self.current_token.token
+
             # Reset method level symbol table and push instance reference
             self.method_level_symbol_table = SymbolTable()
 
             if self.current_token.token == "method":
-                self.method_level_symbol_table.define("this", class_name, "arg")
+                self.method_level_symbol_table.define("this", self.current_class_name, "arg")
 
             self._process(["function", "constructor", "method"])
             self.compile_types_and_user_defined_types()
 
             func_name = self.get_x_previous_token(0).token
             func_type = self.get_x_previous_token(1).token
-            # self._process_identifier(func_name, "subroutine", "-1", True)
+
             self.current_subroutine_name = func_name
             self.has_subroutine_return = False
             self._process([TokenType.IDENTIFIER])
             self._process(["("])
 
-            # self.output += "<parameterList>\n"
             if self.current_token.token != ")":
                     while self.current_token.token != ")":
                         self.compile_types_and_user_defined_types()
@@ -395,22 +449,18 @@ class CompilationEngine:
 
                         if self.current_token.token != ")":
                             self._process([","])
-
-
             self._process([")"])
+
             self.compile_subroutine_body(func_name)
 
     def compile_class(self):
-        # self.output += "<class>"
         self._process(["class"])
 
         self.current_class_name = self.get_x_previous_token(0).token
         self._process([TokenType.IDENTIFIER])
-        # self._process_identifier(var_name, "class", "-1", True)
 
         self._process(["{"])
         self.compile_class_var_dec()
         self.compile_subroutine_dec()
         self._process("}")
-        # self.output += "</class>"
 

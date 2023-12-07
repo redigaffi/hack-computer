@@ -4,6 +4,7 @@ from JackTokenizer import JackTokenizer
 from CompilationEngine import CompilationEngine
 from VMWriter import VMWriter
 import os
+from pprint import pprint
 
 def load_file(path) -> list[str]:
     data = ""
@@ -26,7 +27,7 @@ def compile_file(input, file_name):
     tokenizer = JackTokenizer(data)
     with open(f"{file_name}.vm", "w+") as f:
         vm_writer = VMWriter(f)
-        compilation_engine = CompilationEngine(tokenizer, vm_writer)
+        CompilationEngine(tokenizer, vm_writer)
 
 if __name__ == "__main__":
     path = sys.argv[1]

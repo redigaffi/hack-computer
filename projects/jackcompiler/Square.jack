@@ -1,0 +1,9 @@
+class Square {
+   field int x, y;
+   constructor Square new(int Ax, int Ay) {
+			let x = Ax;
+			let y = Ay;
+			return this;
+   }
+}
+

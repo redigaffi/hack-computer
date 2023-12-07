@@ -1,0 +1,16 @@
+function Square.new 0
+push constant 1
+call Memory.alloc 1
+pop pointer 0
+push pointer 0
+return
+function Square.newInstance 0
+call Square.new 0
+pop static 0
+push static 0
+pop static 1
+push constant 0
+return
+function Square.getInstance 0
+push static 0
+return
