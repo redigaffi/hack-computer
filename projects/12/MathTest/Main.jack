@@ -9,7 +9,9 @@ class Main {
     /** Performs various mathematical operations, using calls to the Math class methods. */
     function void main() {
 				var int a;
-				let a = -8/2; 
+				// let a = Math.pow(5, 2); 
+        let a = 0;
+				let a = 6 * 5; 
 				do Output.printInt(a);
         return;
     }
