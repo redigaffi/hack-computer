@@ -28,8 +28,7 @@ class Math {
 			let bits[12] = 4096;
 			let bits[13] = 8192;
 			let bits[14] = 16384;
-			let bits[15] = 32767;
-
+			let bits[15] = 32767 + 1;  // (this will be represented as -32768 = all 15 bits on)
       return;
     }
 
@@ -52,13 +51,12 @@ class Math {
      *  the Jack expressions x*y and multiply(x,y) return the same value.
      */
     function int multiply(int x, int y) {
-			var int i, sum, shiftedX, tmp;
+			var int i, sum, shiftedX;
 			let sum = 0;
 			let shiftedX = x;
-			
 			let i = 0;
 			while (i < 16) {
-				if (Math.bit(y, i)) {
+        if (y & bits[i]) {
 					let sum = sum + shiftedX;
 				}
 				
@@ -120,18 +118,16 @@ class Math {
 
     function int pow(int x, int y) {
       var int re; 
-      let re = 0;
-      let re = 2*2;
-      let y = y - 1;
-      
-      do Output.printInt(re);
-      while (y > 1) {
-          do Output.printString("ads");
-          let re = re * x;
-          let y = y - 1;
-      }
-      
+      let re = x * 2;
       return re;
+      // let y = y - 1;
+      // 
+      // while (y > 1) {
+      //     let re = re * x;
+      //     let y = y - 1;
+      // }
+      // 
+      // return re;
     }
 
     /** Returns the integer part of the square root of x. */
