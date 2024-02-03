@@ -76,6 +76,16 @@ class String {
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
+      var int lastDigit, tmp;
+      let tmp = val/10;
+      let lastDigit = val-(tmp*10);
+      if (val < 10) {
+        do appendChar(48 + lastDigit);
+      } else {
+        do setInt(tmp);
+        do appendChar(48 + lastDigit);
+      }
+      
       return;
     }
 

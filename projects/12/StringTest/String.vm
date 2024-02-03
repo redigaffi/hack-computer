@@ -117,9 +117,44 @@ goto WHILE_EXP0
 label WHILE_END0
 push local 0
 return
-function String.setInt 0
+function String.setInt 2
 push argument 0
 pop pointer 0
+push argument 1
+push constant 10
+call Math.divide 2
+pop local 1
+push argument 1
+push local 1
+push constant 10
+call Math.multiply 2
+sub
+pop local 0
+push argument 1
+push constant 10
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+push constant 48
+push local 0
+add
+call String.appendChar 2
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push pointer 0
+push local 1
+call String.setInt 2
+pop temp 0
+push pointer 0
+push constant 48
+push local 0
+add
+call String.appendChar 2
+pop temp 0
+label IF_END0
 push constant 0
 return
 function String.newLine 0
