@@ -17,7 +17,11 @@ class String {
     /** constructs a new empty string with a maximum length of maxLength
      *  and initial length of 0. */
     constructor String new(int maxLength) {
-      let str = Array.new(maxLength);
+      if (maxLength = 0) {
+        let str = Array.new(1);
+      } else {
+        let str = Array.new(maxLength);
+      }
       let ptr = 0;
       return this;
     }
@@ -61,15 +65,26 @@ class String {
      *  until a non-digit character is detected. */
     method int intValue() {
       var int val, length, counter, d;
+      var boolean isNeg;
+      let isNeg = false;
       let length = length();
       let counter = 0;
       let val = 0;
       while (counter < length){
         let d = charAt(counter);
-        if (d > 47 & d < 58) {
-          let val = (val * 10) + (d - 48);
+        if (d = 45) {
+          let isNeg = true;
+          let counter = counter + 1;
+        } else {
+          if (d > 47 & d < 58) {
+            let val = (val * 10) + (d - 48);
+          }
+          let counter = counter + 1;
         }
-        let counter = counter + 1;
+      } 
+
+      if (isNeg) {
+        return val*-1;
       }
       return val;
     }
@@ -77,6 +92,15 @@ class String {
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
       var int lastDigit, tmp;
+      let ptr = 0;
+      if (val < 0) {
+        do appendChar(45);
+        do Output.println();
+        do Output.printInt(val);
+        do Output.println();
+        let val = val * -1;
+      }
+
       let tmp = val/10;
       let lastDigit = val-(tmp*10);
       if (val < 10) {
@@ -104,3 +128,4 @@ class String {
       return 34;
     }
 }
+

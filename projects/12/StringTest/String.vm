@@ -3,8 +3,20 @@ push constant 2
 call Memory.alloc 1
 pop pointer 0
 push argument 0
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
 call Array.new 1
 pop this 0
+goto IF_END0
+label IF_FALSE0
+push argument 0
+call Array.new 1
+pop this 0
+label IF_END0
 push constant 0
 pop this 1
 push pointer 0
@@ -70,9 +82,11 @@ sub
 pop this 1
 push constant 0
 return
-function String.intValue 4
+function String.intValue 5
 push argument 0
 pop pointer 0
+push constant 0
+pop local 4
 push pointer 0
 call String.length 1
 pop local 1
@@ -91,15 +105,30 @@ push local 2
 call String.charAt 2
 pop local 3
 push local 3
+push constant 45
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 0
+not
+pop local 4
+push local 2
+push constant 1
+add
+pop local 2
+goto IF_END0
+label IF_FALSE0
+push local 3
 push constant 47
 gt
 push local 3
 and
 push constant 58
 lt
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push local 0
 push constant 10
 call Math.multiply 2
@@ -108,18 +137,54 @@ push constant 48
 sub
 add
 pop local 0
-label IF_FALSE0
+label IF_FALSE1
 push local 2
 push constant 1
 add
 pop local 2
+label IF_END0
 goto WHILE_EXP0
 label WHILE_END0
+push local 4
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push local 0
+push constant 1
+neg
+call Math.multiply 2
+return
+label IF_FALSE2
 push local 0
 return
 function String.setInt 2
 push argument 0
 pop pointer 0
+push constant 0
+pop this 1
+push argument 1
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push pointer 0
+push constant 45
+call String.appendChar 2
+pop temp 0
+call Output.println 0
+pop temp 0
+push argument 1
+call Output.printInt 1
+pop temp 0
+call Output.println 0
+pop temp 0
+push argument 1
+push constant 1
+neg
+call Math.multiply 2
+pop argument 1
+label IF_FALSE0
 push argument 1
 push constant 10
 call Math.divide 2
@@ -133,17 +198,17 @@ pop local 0
 push argument 1
 push constant 10
 lt
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push pointer 0
 push constant 48
 push local 0
 add
 call String.appendChar 2
 pop temp 0
-goto IF_END0
-label IF_FALSE0
+goto IF_END1
+label IF_FALSE1
 push pointer 0
 push local 1
 call String.setInt 2
@@ -154,7 +219,7 @@ push local 0
 add
 call String.appendChar 2
 pop temp 0
-label IF_END0
+label IF_END1
 push constant 0
 return
 function String.newLine 0
