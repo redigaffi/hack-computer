@@ -92,14 +92,11 @@ class String {
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
       var int lastDigit, tmp;
-      let ptr = 0;
       if (val < 0) {
+        let ptr = 0;
         do appendChar(45);
-        do Output.println();
-        do Output.printInt(val);
-        do Output.println();
         let val = val * -1;
-      }
+      } 
 
       let tmp = val/10;
       let lastDigit = val-(tmp*10);

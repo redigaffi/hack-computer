@@ -160,24 +160,17 @@ return
 function String.setInt 2
 push argument 0
 pop pointer 0
-push constant 0
-pop this 1
 push argument 1
 push constant 0
 lt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
+push constant 0
+pop this 1
 push pointer 0
 push constant 45
 call String.appendChar 2
-pop temp 0
-call Output.println 0
-pop temp 0
-push argument 1
-call Output.printInt 1
-pop temp 0
-call Output.println 0
 pop temp 0
 push argument 1
 push constant 1
