@@ -17,12 +17,12 @@ class Memory {
     /** Initializes the class. */
     function void init() {
       let HEAP_START = 2048; 
-      let HEAP_END = 16384; 
+      let HEAP_END = 16383; 
 
       let freeList = HEAP_START; 
       let lastElement = HEAP_START;
       let freeList[0] = 0; // next
-      let freeList[1] = HEAP_END - HEAP_START; // total size  14336
+      let freeList[1] = HEAP_END - HEAP_START; // total size  14335
 
       return;
     }
