@@ -1,0 +1,103 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+		static int HEAP_START;
+		static int HEAP_END;
+		static int lastElement;
+		static Array freeList;
+
+    /** Initializes the class. */
+    function void init() {
+      let HEAP_START = 2048; 
+      let HEAP_END = 16384; 
+
+      let freeList = HEAP_START; 
+      let lastElement = HEAP_START;
+      let freeList[0] = 0; // next
+      let freeList[1] = HEAP_END - HEAP_START; // total size  14336
+
+      return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+      var Array ram;
+      return ram[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+      var Array ram;
+      let ram[address] = value;
+      return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+      var boolean found, exit;
+      var int block, next, previous, tmpSize;
+
+      if (size > 14334) {
+        do Output.printInt(-1);
+        do Output.println();
+      }
+      
+      // First fit
+      let next = freeList[0];
+      let previous = freeList[0];
+
+      let found = false;
+      let exit = false;
+      // while (~found & ~(next = -1)) {
+      while (~exit) {
+        let tmpSize = freeList[next+1];
+        let found = ((tmpSize = (size+2)) | (tmpSize > (size+2)));
+
+        if (~found) {
+           let previous = next;
+           let next = freeList[next];
+
+           if (next = 0 & previous = 0) {
+              let exit = true;
+           }
+        } else {
+          let exit = true;
+        }
+      }
+                    
+      if (~found) {
+        do Output.printInt(-1);
+        do Output.println();
+      }
+
+      let block = freeList[next+1]-(size+2);
+      if (freeList[next+1] > (size+2)) {
+        let freeList[(next+1)] = block; // new size
+        let freeList[(block+1)] = -1; // set default next field
+        let freeList[(block+2)] = size+2; // set block size
+        let block = block + 1;
+      } else { // Is equal
+        let freeList[block] = -1; // set default next field
+        let freeList[previous] = freeList[next]; // remove block from linked list
+      }
+
+      return (HEAP_START + block);
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+      let freeList[(lastElement-HEAP_START)] = o;
+      let lastElement = o;
+      return;
+    }    
+}
