@@ -1,7 +1,7 @@
 function Memory.init 0
 push constant 2048
 pop static 0
-push constant 16384
+push constant 16383
 pop static 1
 push static 0
 pop static 3

@@ -1,0 +1,118 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Screen.jack
+
+/**
+ * A library of functions for displaying graphics on the screen.
+ * The Hack physical screen consists of 256 rows (indexed 0..255, top to bottom)
+ * of 512 pixels each (indexed 0..511, left to right). The top left pixel on 
+ * the screen is indexed (0,0).
+ *
+ * Page 137 pdf
+ * I/O Memory: 
+ * Start at: 16384
+ * Ends at: 24575
+ */
+class Screen {
+    static boolean COLOR;
+    static int GPU_START;
+    static int GPU_END;
+		static Array bits;
+
+    /** Initializes the Screen. */
+    function void init() {
+      let COLOR = false;
+      let GPU_START = 16384;
+      let GPU_END = 24575;
+
+      let bits = Array.new(15);
+			let bits[0] = 1;
+			let bits[1] = 2;
+			let bits[2] = 4;
+			let bits[3] = 8;
+			let bits[4] = 16;
+			let bits[5] = 32;
+			let bits[6] = 64;
+			let bits[7] = 128;
+			let bits[8] = 256;
+			let bits[9] = 512;
+			let bits[10] = 1024;
+			let bits[11] = 2048;
+			let bits[12] = 4096;
+			let bits[13] = 8192;
+			let bits[14] = 16384;
+			let bits[15] = 32767 + 1;
+      return;
+    }
+
+    /** Erases the entire screen. */
+    function void clearScreen() {
+      var Array ram;
+      var int i, end;
+      let ram = 0;
+      let i = GPU_START;
+      let end = GPU_END + 1;
+      while (i < end) {
+        let ram[i] = 0;
+      }
+      return;
+    }
+
+    /** Sets the current color, to be used for all subsequent drawXXX commands.
+     *  Black is represented by true, white by false. */
+    function void setColor(boolean b) {
+      let COLOR = b;
+      return;
+    }
+
+    /** Draws the (x,y) pixel, using the current color. */
+    function void drawPixel(int x, int y) {
+      var int col, pos, data;
+      var Array gpu;
+      let gpu = GPU_START;
+      let pos = (y * 32) + (x/16);
+      let data = gpu[pos];
+      let col = x - ((x/16) * 16);
+      let data = data + bits[col];
+      let gpu[pos] = data;
+      return;
+    }
+
+    /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
+    function void drawLine(int x1, int y1, int x2, int y2) {
+      var int a, b, x, y, dx, dy, diff;
+      let a = 0;
+      let b = 0;
+      let x = x1;
+      let y = y1;
+      let diff = 0;
+      let dx = x2-x1;
+      let dy = y2-y1;
+
+      while (((a < dx) | (a = dx)) & ((b < dy) | (b = dy))) {
+        do Screen.drawPixel(x + a, y + b);
+
+        if (diff < 0) {
+          let a = a + 1;
+          let diff = diff + dy;
+        } else {
+          let b = b + 1;
+          let diff = diff - dx;
+        }
+      }
+
+      return;
+    }
+
+    /** Draws a filled rectangle whose top left corner is (x1, y1)
+     * and bottom right corner is (x2,y2), using the current color. */
+    function void drawRectangle(int x1, int y1, int x2, int y2) {
+      return;
+    }
+
+    /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
+    function void drawCircle(int x, int y, int r) {
+      return;
+    }
+}
