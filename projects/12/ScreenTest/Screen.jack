@@ -26,7 +26,7 @@ class Screen {
       let GPU_START = 16384;
       let GPU_END = 24575;
 
-      let bits = Array.new(15);
+      let bits = Array.new(31);
 			let bits[0] = 1;
 			let bits[1] = 2;
 			let bits[2] = 4;
@@ -43,6 +43,7 @@ class Screen {
 			let bits[13] = 8192;
 			let bits[14] = 16384;
 			let bits[15] = 32767 + 1;
+
       return;
     }
 
@@ -81,7 +82,34 @@ class Screen {
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
+      var int nPixels, col, pos, data, tmpx, tmpy, tmp1;
+      var boolean is_straight;
+      var Array gpu;
       var int a, b, x, y, dx, dy, diff;
+
+      let gpu = GPU_START;
+
+      // Straight horizontal line
+      if (dy = 0) {
+        let tmp1 = (x/16);
+        let pos = (y*32) + tmp1;
+        let data = gpu[pos];
+        let nPixels  = x2 - x1;
+
+        while (nPixels > 0) {
+          if (nPixels > 15) {
+            let gpu[pos] = -1;
+            let nPixels = nPixels - 16;
+          } else {
+            let gpu[pos] = data + bits[nPixels+1] - 1;
+            let nPixels = nPixels - nPixels;
+          }
+          let pos = pos + 1;
+        }
+        return;
+      } 
+      // End straight horizontal line
+
       let a = 0;
       let b = 0;
       let x = x1;
@@ -90,7 +118,20 @@ class Screen {
       let dx = x2-x1;
       let dy = y2-y1;
 
+
+
       while (((a < dx) | (a = dx)) & ((b < dy) | (b = dy))) {
+        // drawPixel inline start
+        // let tmpx = x + a;
+        // let tmpy = y + b;
+        // let tmp1 = (tmpx/16);
+        // let gpu = GPU_START;
+        // let pos = (tmpy*32) + tmp1;
+        // let data = gpu[pos];
+        // let col = tmpx - (tmp1 * 16);
+        // let data = data + bits[col];
+        // let gpu[pos] = data;
+        // drawPixel inline end 
         do Screen.drawPixel(x + a, y + b);
 
         if (diff < 0) {
@@ -108,11 +149,26 @@ class Screen {
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
+      do Screen.drawLine(x1, y1, x2, y1);
+      // do Screen.drawLine(x1, y2, x2, y2);
       return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
+      var int dy, ax, bx, ny, tmp;
+      let dy = -r;
+  
+      while (~(dy = r)) {
+        let ny =  y + dy;
+        let tmp = Math.sqrt((r*r) - (dy*dy));
+        let ax = x - tmp;
+        let bx = x + tmp;
+        // function void drawLine(int x1, int y1, int x2, int y2)
+        do Screen.drawLine(ny, ax, ny, bx);
+        let dy = dy + 1;
+      }
+      
       return;
     }
 }
