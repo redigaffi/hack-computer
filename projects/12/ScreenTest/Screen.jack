@@ -22,11 +22,11 @@ class Screen {
 
     /** Initializes the Screen. */
     function void init() {
-      let COLOR = false;
+      let COLOR = true;
       let GPU_START = 16384;
       let GPU_END = 24575;
 
-      let bits = Array.new(31);
+      let bits = Array.new(15);
 			let bits[0] = 1;
 			let bits[1] = 2;
 			let bits[2] = 4;
@@ -43,6 +43,7 @@ class Screen {
 			let bits[13] = 8192;
 			let bits[14] = 16384;
 			let bits[15] = 32767 + 1;
+			let bits[16] = -1;
 
       return;
     }
@@ -56,6 +57,7 @@ class Screen {
       let end = GPU_END + 1;
       while (i < end) {
         let ram[i] = 0;
+        let i = i + 1;
       }
       return;
     }
@@ -69,70 +71,134 @@ class Screen {
 
     /** Draws the (x,y) pixel, using the current color. */
     function void drawPixel(int x, int y) {
-      var int col, pos, data;
+      var int col, pos, data, tmp;
       var Array gpu;
       let gpu = GPU_START;
-      let pos = (y * 32) + (x/16);
+      let tmp = (x/16);
+      let pos = (y * 32) + tmp;
       let data = gpu[pos];
-      let col = x - ((x/16) * 16);
-      let data = data + bits[col];
-      let gpu[pos] = data;
+      let col = x - (tmp * 16);
+
+      if ((data & bits[col]) = 0) {
+        if (COLOR) {
+          let gpu[pos] = data + (bits[col]);
+        }
+      } else {
+        if (~COLOR) {
+          let gpu[pos] = data - bits[col];
+        }
+      }
+
       return;
     }
 
     /** Draws a line from pixel (x1,y1) to pixel (x2,y2), using the current color. */
     function void drawLine(int x1, int y1, int x2, int y2) {
-      var int nPixels, col, pos, data, tmpx, tmpy, tmp1;
-      var boolean is_straight;
+      var int tmpb, tmpa, tmpi,tmpt, nPixels, col, pos, data, tmpx, tmpy, tmp1, pixelsToApply;
+      var boolean is_straight, x_neg, y_neg;
       var Array gpu;
       var int a, b, x, y, dx, dy, diff;
-
+      
       let gpu = GPU_START;
-
+      let dx = x2-x1;
+      let dy = y2-y1;
+      let x = x1;
+      let y = y1;
+      let diff = 0;
+     
       // Straight horizontal line
       if (dy = 0) {
+        if (x2 < x1) {
+          let tmpb = x1;
+          let x1 = x2;
+          let x2 = tmpb;
+          let x = x1;
+        }
         let tmp1 = (x/16);
         let pos = (y*32) + tmp1;
-        let data = gpu[pos];
-        let nPixels  = x2 - x1;
+        let col = x - (tmp1 * 16);
+        let nPixels = x2 - x1;
 
-        while (nPixels > 0) {
-          if (nPixels > 15) {
-            let gpu[pos] = -1;
-            let nPixels = nPixels - 16;
+        let tmpa = 0;
+        if (nPixels > 16){
+          if (col = 0) {
+            let tmpa = -1;
+            // let gpu[pos] = -1;
           } else {
-            let gpu[pos] = data + bits[nPixels+1] - 1;
-            let nPixels = nPixels - nPixels;
+              let tmpa = bits[17-col]-1;
           }
+        } else {
+          let tmpa = bits[nPixels+1]-1;
+        }
+
+        // left shift
+        let tmpt = col;
+        while (tmpt > 0) {
+          let tmpa = tmpa * 2;
+          let tmpt = tmpt - 1;
+        }
+        // end left shift
+
+        if (COLOR) {
+          let gpu[pos] = gpu[pos]+tmpa;
+        } else {
+          let gpu[pos] = gpu[pos] - (gpu[pos] & tmpa);
+        }
+
+        let nPixels = nPixels - (16-col);
+        let pos = pos + 1;
+        while (nPixels > 0) {
+          if (nPixels > 14) {
+            let nPixels = nPixels - 16;
+            if (COLOR) {
+              let gpu[pos] = -1;
+            } else {
+              let gpu[pos] = 0;
+            }
+          } else {
+            if (COLOR) {
+              let gpu[pos] = (bits[nPixels + 1] - 1);
+            } else {
+              let gpu[pos] = gpu[pos] - (gpu[pos] & (bits[nPixels + 1] - 1));
+            }
+            let nPixels = 0;
+          }
+          
           let pos = pos + 1;
         }
+
         return;
       } 
       // End straight horizontal line
 
+      let y_neg = false;
+      if (dy < 0) {
+        let dy = -dy;
+        let y_neg = true;
+      }
+
+      let x_neg = false;
+      if (dx < 0) {
+        let dx = -dx;
+        let x_neg = true;
+      }
+
       let a = 0;
       let b = 0;
-      let x = x1;
-      let y = y1;
-      let diff = 0;
-      let dx = x2-x1;
-      let dy = y2-y1;
-
-
 
       while (((a < dx) | (a = dx)) & ((b < dy) | (b = dy))) {
-        // drawPixel inline start
-        // let tmpx = x + a;
-        // let tmpy = y + b;
-        // let tmp1 = (tmpx/16);
-        // let gpu = GPU_START;
-        // let pos = (tmpy*32) + tmp1;
-        // let data = gpu[pos];
-        // let col = tmpx - (tmp1 * 16);
-        // let data = data + bits[col];
-        // let gpu[pos] = data;
-        // drawPixel inline end 
-        do Screen.drawPixel(x + a, y + b);
+        if (y_neg) {
+          let tmpy = y - b;
+        } else {
+          let tmpy = y + b;
+        }
+        if (x_neg) {
+          let tmpx = x - a;
+        } else {
+          let tmpx = x + a;
+        }
+
+        do Screen.drawPixel(tmpx, tmpy);
 
         if (diff < 0) {
           let a = a + 1;
@@ -149,23 +215,65 @@ class Screen {
     /** Draws a filled rectangle whose top left corner is (x1, y1)
      * and bottom right corner is (x2,y2), using the current color. */
     function void drawRectangle(int x1, int y1, int x2, int y2) {
-      do Screen.drawLine(x1, y1, x2, y1);
-      // do Screen.drawLine(x1, y2, x2, y2);
+      while (y1 < y2) {
+
+        do Screen.drawLine(x1, y1, x2, y1);
+        let y1 = y1 +1;
+      } 
+
+      // left
+      // do Screen.drawLine(x1, y1, x1, y2);
+      //
+      // //top
+      // do Screen.drawLine(x1, y1, x2, y1);
+      //
+      // // bottom
+      // do Screen.drawLine(x1, y2, x2-1, y2);
+      //
+      // // right
+      // do Screen.drawLine(x2, y1+1, x2, y2);
+
       return;
     }
 
     /** Draws a filled circle of radius r<=181 around (x,y), using the current color. */
     function void drawCircle(int x, int y, int r) {
-      var int dy, ax, bx, ny, tmp;
+      var int dy, ax, bx, ny, tmp, tmpr;
       let dy = -r;
-  
-      while (~(dy = r)) {
+
+      // if (r > 181) {
+      //   let r = 181
+      // }
+      let tmpr = r*r;
+      while (~(dy = (r+1))) {
         let ny =  y + dy;
-        let tmp = Math.sqrt((r*r) - (dy*dy));
+        let tmp = Math.sqrt(((r*r) - (dy*dy)));
         let ax = x - tmp;
         let bx = x + tmp;
+        // do Output.printInt(ax);
+        // do Output.println();
+        // do Output.printInt(bx);
+        // do Output.println();
+        // do Output.println();
         // function void drawLine(int x1, int y1, int x2, int y2)
-        do Screen.drawLine(ny, ax, ny, bx);
+        // do Screen.drawLine(ny, ax, ny, bx);
+        // if (dy = -23) {
+        //   do Output.printInt(ax);
+        //   do Output.println();
+        //   do Output.printInt(ny);
+        //   do Output.println();
+        //   do Output.printInt(bx);
+        //   do Output.println();
+        //   do Output.printInt(ny);
+        //   do Sys.halt();
+        // } 
+        do Screen.drawLine(ax, ny, bx, ny);
+        if (dy = -10) {
+          // do Output.printInt(ax);
+          // do Output.println();
+          // do Output.printInt(bx);
+          // do Sys.halt();
+        }
         let dy = dy + 1;
       }
       

@@ -1,0 +1,13 @@
+function Main.main 1
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push constant 280
+push constant 90
+push constant 345
+push constant 35
+call Screen.drawLine 4
+pop temp 0
+push constant 0
+return
