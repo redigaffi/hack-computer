@@ -8,53 +8,7 @@ class Main {
 
     /** Draws a sample pictue on the screen using lines and circles. */
     function void main() {
-        var Array gpu;
-    
-        // do Screen.drawLine(0,220,20,220);        // base line
-
-        // do Output.printInt((32767+1) & 16384);
-        // do Output.printInt(16384 & 16384);
-
-        // do Output.drawLine(0, 5, 20, 5);
-        // do Screen.drawPixel(3, 10);
-        // do Screen.drawPixel(3, 10);
-        // do Screen.drawPixel(3, 10);
-        // do Screen.drawPixel(3, 10);
-        // do Screen.drawPixel(3, 10);
-
-
-        // do Screen.setColor(false); 
-        // do Screen.drawRectangle(350,120,390,219); // door
-        // do Screen.drawRectangle(292,120,332,150); // window
-        // 
-
-        do Screen.setColor(true); 
-        // do Screen.drawCircle(360,170,3);          // door handle
-        do Screen.drawLine(5,35,100,35);        // roof
-
-        do Screen.setColor(false); 
-        do Screen.drawPixel(10, 35);        // roof
-        do Screen.drawPixel(11, 35);        // roof
-        do Screen.drawPixel(12, 35);        // roof
-        do Screen.drawPixel(13, 35);        // roof
-        do Screen.drawPixel(14, 35);        // roof
-        do Screen.drawPixel(15, 35);        // roof
-        do Screen.drawPixel(16, 35);        // roof
-      
-        do Screen.setColor(false); 
-        do Screen.drawLine(7,35,20,35);        // roof
-        // do Screen.drawPixel(0, 0);        // roof
-        // do Screen.drawPixel(152, 25);        // roof
-        // do Screen.drawPixel(128, 25);        // roof
-        // do Screen.drawLine(0,2,50,2);        // roof
-        // do Screen.drawLine(140,26, 140, 6);       
-        // do Screen.drawLine(163,35,178,20);       
-        // do Screen.drawLine(174,60,194,60);       
-        // do Screen.drawLine(163,85,178,100);       
-        // do Screen.drawLine(140,94,140,114);       
-        // do Screen.drawLine(117,85,102,100);       
-        // do Screen.drawLine(106,60,86,60);       
-        // do Screen.drawLine(117,35,102,20);        
+        do Output.printChar(65);
         return;
     }
 }
