@@ -78,7 +78,7 @@ class Output {
         do Output.create(64,30,51,51,59,59,59,27,3,30,0,0);  // @
         do Output.create(63,30,51,51,24,12,12,0,12,12,0,0);  // ?
 
-        do Output.create(65,12,30,51,51,63,63,51,51,51,0,0);
+        do Output.create(65,12,30,51,51,63,63,51,51,51,0,0); // A
         do Output.create(66,31,51,51,51,31,51,51,51,31,0,0); // B
         do Output.create(67,28,54,35,3,3,3,35,54,28,0,0);    // C
         do Output.create(68,15,27,51,51,51,51,51,27,15,0,0); // D
@@ -183,8 +183,35 @@ class Output {
     /** Moves the cursor to the j-th column of the i-th row,
      *  and erases the character displayed there. */
     function void moveCursor(int i, int j) {
+      var Array gpu;
+      var int tmp, pos, x, y, col;
+      if (i > 22) {
+        let i = 0;
+      }
+      if (j > 63) {
+        let j = 0;
+        let i = i + 1;
+      } 
+      let gpu = 16384;
       let cursorRow = i;
       let cursorCol = j;
+      let x = cursorCol*8;
+      let y = cursorRow*11;
+      while (i < 12) {
+        let tmp = (x/16);
+        let pos = (y* 32) + tmp;
+        let col = x - (tmp * 16);
+        if (col = 0) {
+          // 255 (0000000011111111)
+          let gpu[pos] = gpu[pos] - (gpu[pos] & 255);
+        } else {
+          // - 256 (1111111100000000)
+          let gpu[pos] = gpu[pos] - (gpu[pos] & -256);
+        }
+        // let gpu[pos] = 0;
+        let y = y + 1;
+        let i = i + 1;
+      }
       return;
     }
 
@@ -218,8 +245,14 @@ class Output {
         let i = i + 1;
       }
 
+      if (cursorCol = 63 & cursorRow = 22) {
+        let cursorCol = 0;
+        let cursorRow = 0;
+        return;
+      }
+
       let cursorCol = cursorCol + 1;
-      if (cursorCol = 64) {
+      if (cursorCol = 63) {
         let cursorCol = 0;
         let cursorRow = cursorRow + 1;
       }
@@ -244,6 +277,40 @@ class Output {
     /** Displays the given integer starting at the cursor location,
      *  and advances the cursor appropriately. */
     function void printInt(int i) {
+      var Array re;
+      var int l, a, digit, tmp;
+      var boolean neg;
+
+      let re = Array.new(5);
+      let neg = false;
+      if (i < 0) {
+        let neg = true;
+        let i = i * -1;
+      }
+
+      let l = 0;
+      while (i > 0) {
+        if ((i > 10) | (i = 10)) {
+          let tmp = i / 10;
+          let digit = i - (tmp*10);
+          let re[l] = digit;
+          let l = l + 1;
+          let i = i / 10;
+        } else {
+          let re[l] = i;
+          let i = 0;
+        }
+      }
+      
+      if (neg) {
+        do Output.printChar(45);
+      }
+
+      while (l > -1) {
+        do Output.printChar(48 + re[l]);
+        let l = l - 1;
+      }
+
       return;
     }
 
@@ -256,6 +323,10 @@ class Output {
 
     /** Moves the cursor one column back. */
     function void backSpace() {
+      if (cursorCol > 0) {
+        let cursorCol = cursorCol - 1;
+        do Output.moveCursor(cursorRow, cursorCol);
+      }
       return;
     }
 }
