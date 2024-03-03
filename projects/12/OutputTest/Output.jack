@@ -270,6 +270,11 @@ class Output {
       while (i < length) {
         do Output.printChar(s.charAt(i));
         let i = i + 1;
+        let cursorCol = cursorCol + 1;
+        if (cursorCol = 63) {
+          let cursorCol = 0;
+          let cursorRow = cursorRow + 1;
+        }
       }
       return;
     }
@@ -326,6 +331,11 @@ class Output {
       if (cursorCol > 0) {
         let cursorCol = cursorCol - 1;
         do Output.moveCursor(cursorRow, cursorCol);
+      } else {
+        if (cursorRow > 0) {
+          let cursorCol = 63;
+          let cursorRow = cursorRow - 1;
+        }
       }
       return;
     }
