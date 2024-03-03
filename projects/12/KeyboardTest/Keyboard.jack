@@ -1,0 +1,211 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Keyboard.jack
+
+/**
+ * A library for handling user input from the keyboard.
+ */
+class Keyboard {
+    static int KBD;
+
+    /** Initializes the keyboard. */
+    function void init() {
+      let KBD = 24576;
+      return;
+    } 
+
+    /**
+     * Returns the character of the currently pressed key on the keyboard;
+     * if no key is currently pressed, returns 0.
+     *
+     * Recognizes all ASCII characters, as well as the following keys:
+     * new line = 128 = String.newline()
+     * backspace = 129 = String.backspace()
+     * left arrow = 130
+     * up arrow = 131
+     * right arrow = 132
+     * down arrow = 133
+     * home = 134
+     * End = 135
+     * page up = 136
+     * page down = 137
+     * insert = 138
+     * delete = 139
+     * ESC = 140
+     * F1 - F12 = 141 - 152
+     */
+    function char keyPressed() {
+      var Array keyboard;
+      let keyboard = KBD;
+      return keyboard[0];
+    }
+
+    /**								
+     * Waits until a key is pressed on the keyboard and released,
+     * then echoes the key to the screen, and returns the character 
+     * of the pressed key.
+     */
+    function char readChar() {
+      var char keyPressed;
+      do Output.printChar(0);
+      while (Keyboard.keyPressed() = 0) {}
+      let keyPressed = Keyboard.keyPressed();
+      while (~(Keyboard.keyPressed() = 0)) {}
+      do Output.backSpace();
+      do Output.printChar(keyPressed);
+      return keyPressed;
+    }
+
+    /**								
+     * Displays the message on the screen, reads from the keyboard the entered
+     * text until a newline character is detected, echoes the text to the screen,
+     * and returns its value. Also handles user backspaces.
+     */
+    function String readLine(String message) {
+      var String result, tmp;
+      var char keyPressed;
+      var int l, i, count, maxLength;
+      
+      let i = 0;
+      let l = message.length();
+      while (i < l) {
+        do Output.printChar(message.charAt(i));
+        let i = i + 1;
+      }
+      
+      let maxLength = 15;
+      let count = 0;
+      let result = String.new(maxLength);
+
+      while (true) { 
+        let keyPressed = Keyboard.readChar();
+        
+        if (keyPressed = 128) {
+          do Output.println();
+          return result;
+        }
+
+        if (keyPressed = 129) {
+          let count = count - 1;
+          do result.eraseLastChar();
+          // do Output.backSpace();
+        } else {
+          if (count < maxLength) {
+            do result.appendChar(keyPressed);
+            let count = count + 1;
+          } else {
+            // resize string
+            let tmp = String.new(maxLength + 15);
+            let maxLength = maxLength + 15;
+
+            let i = 0;
+            let l = result.length();
+            while (i < l) {
+              do tmp.appendChar(result.charAt(i));
+              let i = i + 1;
+            }
+
+            let result = tmp;
+          }
+        }
+      }
+
+      return result;
+    }   
+
+    /**								
+     * Displays the message on the screen, reads from the keyboard the entered
+     * text until a newline character is detected, echoes the text to the screen,
+     * and returns its integer value (until the first non-digit character in the
+     * entered text is detected). Also handles user backspaces. 
+     */
+    function int readInt(String message) {
+      var int re;
+      var Array arr1, result, tmp, digits;
+      var char keyPressed;
+      var int neg, l, i, added, count, maxLength;
+      var boolean  started, keepAdding;
+      
+      let i = 0;
+      let l = message.length();
+      while (i < l) {
+        do Output.printChar(message.charAt(i));
+        let i = i + 1;
+      }
+      
+      let maxLength = 15;
+      let count = 0;
+      let result = Array.new(maxLength);
+
+      let neg = 1;
+      let arr1 = Array.new(5);
+      while (true) { 
+        let keyPressed = Keyboard.readChar();
+        
+        if (keyPressed = 128) {
+          do Output.println();
+          let started = false;
+          let i = 0;
+          let added = 0;
+          let keepAdding = true;
+
+          while ((i < count) & keepAdding) {
+            let keepAdding = result[i] > 47 & result[i] < 58;
+            if (keepAdding) {
+              let arr1[i] = result[i];
+              let added = added + 1;
+              let i = i + 1;
+            } 
+          }
+
+          if (added) {
+            let digits = Array.new(5);
+            let digits[4] = 10000;
+            let digits[3] = 1000;
+            let digits[2] = 100;
+            let digits[1] = 10;
+            let digits[0] = 1;
+            let i = 0;
+            let re = 0;
+
+            while (i < added) {
+              let re = re + ((arr1[i]-48) * digits[(added-1)-i]);
+              let i = i + 1;
+            }
+            
+            return re*neg;
+          }
+
+          return 0; 
+        }
+
+        if (keyPressed = 129) {
+          let count = count - 1;
+        } else {
+          if (count < maxLength) {
+            if (keyPressed = 45) {
+              let neg = -1;
+            } else {
+              let result[count] = keyPressed;
+              let count = count + 1;
+            }
+          } else {
+            // resize
+            let tmp = Array.new(maxLength + 15);
+            let maxLength = maxLength + 15;
+
+            let i = 0;
+            while (i < count) {
+              let tmp[i] = result[i];
+              let i = i + 1;
+            }
+
+            let result = tmp;
+          }
+        }
+      }
+
+      return re;
+    }
+}
