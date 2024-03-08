@@ -1,6 +1,6 @@
 from dataclasses import dataclass 
 from typing import Any
-from enum import StrEnum, EnumMeta
+from enum import Enum, EnumMeta
 
 class MetaEnum(EnumMeta):
     def __contains__(cls, item):
@@ -10,7 +10,7 @@ class MetaEnum(EnumMeta):
         except ValueError:
             return False
 
-class BaseEnum(StrEnum, metaclass=MetaEnum):
+class BaseEnum(str, Enum, metaclass=MetaEnum):
     pass
 
 class VarKind(BaseEnum):

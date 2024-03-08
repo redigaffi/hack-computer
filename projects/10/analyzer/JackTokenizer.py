@@ -1,4 +1,4 @@
-from enum import StrEnum, EnumMeta
+from enum import Enum, EnumMeta
 from pprint import pprint
 from dataclasses import dataclass 
 from typing import Any
@@ -11,7 +11,7 @@ class MetaEnum(EnumMeta):
         except ValueError:
             return False
 
-class BaseEnum(StrEnum, metaclass=MetaEnum):
+class BaseEnum(str,Enum, metaclass=MetaEnum):
     pass
 
 class Keyword(BaseEnum):
@@ -80,7 +80,7 @@ class Token:
 
 class JackTokenizer:
     token_pointer = 0
-    tokens: list[Token] = []
+    tokens = []
 
     @staticmethod
     def get_char(index, data):
@@ -191,6 +191,9 @@ class JackTokenizer:
         return char_pointer+i, Token(TokenType.IDENTIFIER, tmp), True
         
     def __init__(self, data: str):
+        self.token_pointer = 0
+        self.tokens = []
+
         char_pointer = 0
         tokenizing_functions = [
             JackTokenizer.is_symbol,
@@ -268,7 +271,7 @@ class JackTokenizer:
             elif token.token_type == TokenType.INT_CONST:
                 output += f"""<integerConstant> {token.token} </integerConstant>\n"""
             elif token.token_type == TokenType.STRING_CONST:
-                output += f"""<stringConstant> {token.token} </stringConstant>\n"""
+                output += f"""<stringConstant> {token.token}\u0020</stringConstant>\n"""
 
         output += """</tokens>"""
         return output

@@ -1,20 +1,47 @@
 from JackTokenizer import Token, JackTokenizer, TokenType, Keyword, Symbol
 from typing import Optional, List
 import xml.etree.ElementTree as ET
+from xml.dom.minidom import parseString
+
 
 class CompilationEngine:
-    def __init__(self, tokenizer: JackTokenizer):
+    def __init__(self, tokenizer: JackTokenizer, output_file):
         self.tokenizer: JackTokenizer = tokenizer
         self.current_token: Token = tokenizer.tokens[self.tokenizer.token_pointer]
         self.output = ""
         self.compile_class()
 
         element = ET.XML(self.output)
-        ET.indent(element)
-        with open("output.xml", "w") as f:
-            f.write(str(ET.tostring(element, encoding='unicode', short_empty_elements=False)))
+        def prettify(elem, level=0):
+            indent = "    "  # Four spaces for each level of indentation
+            new_line = "\n"
+            if len(elem):
+                if not elem.text or not elem.text.strip():
+                    elem.text = new_line + indent * (level + 1)
+                if not elem.tail or not elem.tail.strip():
+                    elem.tail = new_line + indent * level
+                for child in elem:
+                    prettify(child, level + 1)
+                if not elem.tail or not elem.tail.strip():
+                    elem.tail = new_line + indent * level
+            else:
+                if not elem.text or not elem.text.strip():
+                    elem.text = new_line + indent * level
+                if level and (not elem.tail or not elem.tail.strip()):
+                    elem.tail = new_line + indent * (level - 1)
+        # element = parseString(self.output)
+        #ET.indent(element)
+        with open(output_file, "w+") as f:
+            try:
+                prettify(element)
+                f.write(str(ET.tostring(element, encoding='unicode', method="xml", short_empty_elements=False)))
+            except Exception as ex:
+                print(f"exception: {ex}")
 
-    def _process(self, expected_token: List[str]):
+            # f.write(element.toprettyxml(indent="   "))
+            # f.write(element.toprettyxml(indent="   "))
+
+    def _process(self, expected_token):
         found = None
         for tok in expected_token:
             if tok in TokenType:
@@ -25,7 +52,7 @@ class CompilationEngine:
                 found = tok
 
         assert found is not None, f"Expected {', '.join(expected_token)} instead found {self.current_token.token} {self.current_token.token_type} "
-        token_type = self.current_token.token_type
+        token_type = self.current_token.token_type.value
 
         xml_map = {
             TokenType.INT_CONST: "integerConstant",

@@ -6,8 +6,10 @@ import config
 config.file_name = sys.argv[1]
 config.arg1 = sys.argv[1]
 from op import Operation, OpCodes, MemorySegments, opcode_asm_mapping
+import os
 
-def load_file_and_cleanup(path) -> list[str]:
+def load_file_and_cleanup(path):
+    print(f"input: {path}")
     with open(path, "r") as hack_vm_file:
         lines = []
         for line in hack_vm_file:
@@ -29,7 +31,7 @@ def load_file_and_cleanup(path) -> list[str]:
 
         return lines
 
-def tokenize(lines: list[str]) -> list[Operation]:
+def tokenize(lines):
     operations = []
     for line in lines:
         args = line.split(" ")
@@ -52,17 +54,21 @@ def tokenize(lines: list[str]) -> list[Operation]:
         operations.append(operation)
     return operations
 
-def generate_hack_asm(tokens: list[Operation]) -> str:
+def generate_hack_asm(tokens):
     output = ""
     for token in tokens:
         token_to_asm_mapper = opcode_asm_mapping.get(token.opcode)
-        output += f"//{token.raw_line}"
+        # output += f"//{token.raw_line}"
         mapper = token_to_asm_mapper(token)
         output += str(mapper) + "\n"
+
+    output = output[:-1]
+    output += "\r\n"
                 
     return output
 
 def write_to_file(file_name: str, machine_code: str) -> None:
+    print(f"output: {file_name}")
     with open(file_name, 'w') as f:
         f.write(machine_code)
 
@@ -160,7 +166,8 @@ M=D
 (Bootstrap$ret.0)
 """
 
-asm_content = bootstrap_code()
+# asm_content = bootstrap_code()
+asm_content = ""
 path = f"{config.arg1.split('.')[0]}.asm"
 
 if os.path.isfile(config.arg1):
@@ -173,7 +180,7 @@ else:
         config.arg1 = config.arg1[:-1] 
 
     file_name = config.arg1.split('/')[-1]
-    path = f"{folder}/{file_name}.asm"
+    path = f"{folder}{file_name}.asm"
     
     for filename in os.scandir(config.arg1):
         if filename.is_file():
@@ -186,5 +193,5 @@ else:
             tokens = tokenize(lines)
             asm_content += generate_hack_asm(tokens)
 
-
+asm_content = asm_content.replace("/", "")
 write_to_file(path, asm_content)

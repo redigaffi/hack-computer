@@ -1,5 +1,5 @@
 from io import TextIOWrapper
-from enum import StrEnum, EnumMeta
+from enum import Enum, EnumMeta
 from typing import Any
 
 class MetaEnum(EnumMeta):
@@ -10,7 +10,7 @@ class MetaEnum(EnumMeta):
         except ValueError:
             return False
 
-class BaseEnum(StrEnum, metaclass=MetaEnum):
+class BaseEnum(str, Enum, metaclass=MetaEnum):
     pass
 
 class Segment(BaseEnum):

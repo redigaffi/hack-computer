@@ -34,13 +34,11 @@ if __name__ == "__main__":
     if os.path.isdir(path):
         files = os.listdir(path)
         for file in files:
-            print(f"file {file}")
             name, extension = file.split(".")
             if extension != "jack":
                 continue
 
             compile_file(f"{path}/{file}", f"{path}/{name}")
     else:
-        print(f"why {path}")
         name, extension = path.split(".")
         compile_file(path, name)

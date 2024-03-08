@@ -54,7 +54,7 @@ memory_segment_asm_label_mapping = {
 class Operation:
     raw_line: str
     opcode: OpCodes
-    segment: Optional[MemorySegments|str]
+    segment: str
     index: Optional[int]
 
 def handle_memory_segment_pointer(op: Operation) -> str:
@@ -117,8 +117,7 @@ class Op_Pop():
         else:
             mem_segment = handle_memory_segments(self.operation)
 
-            return f"""
-{mem_segment}
+            return f"""{mem_segment}
 D=A
 @R13
 M=D
@@ -128,7 +127,6 @@ D=M
 @R13
 A=M
 M=D
-//SP--
 @SP
 M=M-1"""      
 
@@ -141,24 +139,20 @@ class Op_Push():
 
     def __str__(self) -> str:
         if self.operation.segment == MemorySegments.M_CONSTANT:
-            return f"""
-@{self.operation.index}
+            return f"""@{self.operation.index}
 D=A
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1"""
         else:
             mem_segment = handle_memory_segments(self.operation)
-            return f"""
-{mem_segment}
+            return f"""{mem_segment}
 D=M
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1"""
 
@@ -170,8 +164,7 @@ class Op_Add():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
@@ -180,7 +173,6 @@ D=M+D
 A=M-1
 A=A-1
 M=D
-//SP--
 @SP
 M=M-1"""
 
@@ -192,19 +184,15 @@ class Op_Sub():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
 D=M-D
-
-// STACK[SP-2] = D
 @SP
 A=M-1
 A=A-1
 M=D
-//SP--
 @SP
 M=M-1"""
 
@@ -216,12 +204,10 @@ class Op_Neg():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=!M
 D=D+1
-// STACK[SP-1] = D
 @SP
 A=M-1
 M=D"""
@@ -237,36 +223,25 @@ class Op_Eq():
         global jump_counter
         jump_name = f"JUMP_{jump_counter}"
         jump_counter += 1
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
-
-// D = STACK[SP-1] - STACK[SP-2]
 D=D-M
 @{jump_name}
-
-// if D == 0 jump to EQUAL
 D;JEQ
-
-// STACK[SP-2] = 0 (turn all bits off - false)
 @SP
 A=M-1
 A=A-1
 M=0
 @{jump_name}_END
 0;JMP
-
-// STACK[SP-2] = -1 (turn all bits on - true)
 ({jump_name})
 @SP
 A=M-1
 A=A-1
 M=-1
 ({jump_name}_END)
-
-// SP--
 @SP
 M=M-1"""
 
@@ -281,36 +256,25 @@ class Op_Gt():
         global jump_counter
         jump_name = f"JUMP_{jump_counter}"
         jump_counter += 1
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
-
-// D = STACK[SP-2] - STACK[SP-1]
 D=M-D
 @{jump_name}
-
-// if D > 0 jump to GREATER
 D;JGT
-
-// STACK[SP-2] = 0 (turn all bits off - false)
 @SP
 A=M-1
 A=A-1
 M=0
 @{jump_name}_END
 0;JMP
-
-// STACK[SP-2] = -1 (turn all bits on - true)
 ({jump_name})
 @SP
 A=M-1
 A=A-1
 M=-1
 ({jump_name}_END)
-
-// SP--
 @SP
 M=M-1"""
 
@@ -325,36 +289,25 @@ class Op_Lt():
         global jump_counter
         jump_name = f"JUMP_{jump_counter}"
         jump_counter += 1
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
-
-// D = STACK[SP-2] - STACK[SP-1]
 D=M-D
-
-// if D < 0 jump to GREATER
 @{jump_name}
 D;JLT
-
-// STACK[SP-2] = 0 (turn all bits off - false)
 @SP
 A=M-1
 A=A-1
 M=0
 @{jump_name}_END
 0;JMP
-
-// STACK[SP-2] = -1 (turn all bits on - true)
 ({jump_name})
 @SP
 A=M-1
 A=A-1
 M=-1
 ({jump_name}_END)
-
-// SP--
 @SP
 M=M-1"""
 
@@ -366,22 +319,15 @@ class Op_And():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
-
-// D = STACK[SP-2] & STACK[SP-1]
 D=M&D
-
-// STACK[SP-2] = D
 @SP
 A=M-1
 A=A-1
 M=D
-
-// SP--
 @SP
 M=M-1"""
 
@@ -393,22 +339,15 @@ class Op_Or():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 D=M
 A=A-1
-
-// D = STACK[SP-2] | STACK[SP-1]
 D=M|D
-
-// STACK[SP-2] = D
 @SP
 A=M-1
 A=A-1
 M=D
-
-// SP--
 @SP
 M=M-1"""
 
@@ -420,8 +359,7 @@ class Op_Not():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@SP
+        return f"""@SP
 A=M-1
 M=!M"""
 
@@ -433,14 +371,11 @@ class Op_Function():
         self.operation = operation
 
     def __str__(self) -> str:
-        push = f"""
-// push 0
-@0
+        push = f"""@0
 D=A
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1
 """ * self.operation.index
@@ -457,14 +392,10 @@ class Op_Return():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-// endFrame = LCL
-@LCL
+        return f"""@LCL
 D=M
 @endFrame
 M=D
-
-//retAddr = *(endFrame - 5)
 @5
 D=A
 @endFrame
@@ -473,22 +404,16 @@ A=D
 D=M
 @retAddr
 M=D
-
-//*ARG = pop
 @SP
 A=M-1
 D=M
 @ARG
 A=M
 M=D
-
-// SP = ARG + 1 
 @ARG
 D=M+1
 @SP
 M=D
-
-// THAT = *(endFrame - 1)
 @1
 D=A
 @endFrame
@@ -497,8 +422,6 @@ A=D
 D=M
 @THAT
 M=D
-
-// THIS = *(endFrame - 2)
 @2
 D=A
 @endFrame
@@ -507,8 +430,6 @@ A=D
 D=M
 @THIS
 M=D
-
-// ARG = *(endFrame - 3)
 @3
 D=A
 @endFrame
@@ -517,8 +438,6 @@ A=D
 D=M
 @ARG
 M=D
-
-// LCL = *(endFrame - 4)
 @4
 D=A
 @endFrame
@@ -527,8 +446,6 @@ A=D
 D=M
 @LCL
 M=D
-
-// goto retAddr
 @retAddr
 A=M
 0;JMP"""
@@ -545,63 +462,41 @@ class Op_Call():
         return_entry = function_return_jumps.get(f"{file_name}$ret", 0)
         function_return_jumps[f"{file_name}$ret"] = return_entry + 1
         label_name = f"{file_name}$ret.{return_entry}"
-        return f"""
-// push return address to stack
-@{label_name}
+        return f"""@{label_name}
 D=A
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1
-
-
-//push LCL
 @LCL
 D=M
-
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1
-
-//push ARG
 @ARG
 D=M
-
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1
-
-//push THIS 
 @THIS
 D=M
-
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1
-
-//push THAT 
 @THAT
 D=M
-
 @SP
 A=M
 M=D
-// SP++
 @SP
 M=M+1
-
-//ARG = SP-5-nArgs
 @{self.operation.index}
 D=A
 @5
@@ -610,8 +505,6 @@ D=D+A
 D=M-D
 @ARG
 M=D
-
-//LCL = SP
 @SP
 D=M
 @LCL
@@ -640,8 +533,7 @@ class Op_Goto():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-@{self.operation.segment}
+        return f"""@{self.operation.segment}
 0;JMP
 """
 
@@ -654,17 +546,11 @@ class Op_IfGoto():
         self.operation = operation
 
     def __str__(self) -> str:
-        return f"""
-//D = *SP
-@SP
+        return f"""@SP
 A=M-1
 D=M
-
-//SP--
 @SP
 M=M-1
-
-// if D != 0 JUMP
 @{self.operation.segment}
 D;JNE
 """
